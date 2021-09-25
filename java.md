@@ -378,13 +378,15 @@ In Java, a character is a value of the type ```char```. Characters have numeric 
 "H"  //string, a vlaue of type String
 ```
 
-The string method ```charAt()``` returns the character at an index of the String. Strings are indexed beginning at 0.
+The String method ```charAt()``` returns the character at an index of the String. Strings are indexed beginning at 0.
 
 ```java
 String name = "Harry";
 char start = name.charAt(0); 
 char last = name.charAt(4);
 ```
+
+The String method ```contains(char)``` returns true if the String contains the char (need to confirm later if it accepts a String type as an argument)
 
 ### Substrings
 
@@ -738,9 +740,7 @@ while (balance < TARGET)
 }
 ```
 
-### ```for``` loop
-
-for loop: is used when a variable runs from a starting point to an ending point with a constant increment or decrement. 
+A certain form of while loops that are common involve initializing and using a counter.
 ```java
 int counter = 1; // Initialize the counter
 while (counter <= 10) // Check the counter
@@ -749,3 +749,176 @@ while (counter <= 10) // Check the counter
    counter++; // Update the counter 
 }
 ```
+Since this form is so common, the ```for``` loop was created.
+
+### ```for``` loop
+
+for loop: used when a variable runs from a starting point to an ending point with a constant increment or decrement. 
+```java
+for (int counter = 1; counter <= 10; counter++)
+{
+   System.out.println(counter);
+}
+```
+
+It is important to note the order of execution of these statements. First, when the loop is encountered, the counter variable ```counter``` is initialized (before entering loop). Then, for each iteration in the loop, the condition is first checked before the iteration (before entering the loop). If the condition evaluates to true, the code enters the body of the loop and executes everything. Lastly, the counter variable is incremented/decremented depending on the statement in the header of the for loop (here, the counter is incremented: ```counter++```). Note, the counter could increase by 2 (```counter = counter + 2```) or even decrement (```counter--```).
+
+### ```do``` loop
+
+do loop: appropriate when the loop body must be executed at least once. This might be useful when you specifically want to execute some code once, and then check for a conditional statement before repeating code executed once already:
+
+```java
+int value;
+do
+{
+   System.out.print("Enter an integer < 100: ");
+   value = in.nextInt();
+}
+while (value >= 100);
+```
+
+### Sentinel Values
+
+When reading a sequence of numbers, it is sometimes useful to include a non-physical number to a list of numbers to denote termination of the sequence. A sentinel serves as a signal for termination, usually. For example, in a sequence of numbers representing the number of apples picked each day, we might include "-1" at the end of the sequence to denote the end of the sequence.
+
+Example use of a sentinel to continually read input from the user until a -1 is encountered:
+```java
+import java.util.Scanner;
+
+/**
+   This program prints the average of salary values that are terminated with a 
+   sentinel.
+*/
+public class SentinelDemo
+{
+   public static void main(String[] args)
+   {  
+      double sum = 0;
+      int count = 0;
+      double salary = 0;
+      System.out.print("Enter salaries, -1 to finish: ");
+      Scanner in = new Scanner(System.in);
+
+      // Process data until the sentinel is entered 
+
+      while (salary != -1)
+      {  
+         salary = in.nextDouble();
+         if (salary != -1) 
+         {  
+            sum = sum + salary;
+            count++;
+         }
+      }
+
+      // Compute and print the average
+
+      if (count > 0)
+      {
+         double average = sum / count;
+         System.out.println("Average salary: " + average);
+      }
+      else
+      {
+         System.out.println("No data");
+      }
+   }
+}
+```
+
+### ```break``` statement
+
+Loops can be terminated early using a ```break``` statement:
+
+```java
+while (true)
+{
+   double value = in.nextDouble();
+   if (value == -1)
+   {
+       break;
+   }
+}
+```
+
+### Redirection of input and output
+
+```Input redirection``` allows you to use text stored in a file to be used as the input in a java program. This is done with the ```<``` symbol at the command line. Likewise, output from a java program can be redirected a file using the ```>``` symbol at the command line (```output redirection```):
+
+```bash
+java SentinelDemo < numbers.txt > output.txt
+```
+
+In summary, use input redirection to read input from a file. Use output redirection to capture program output in a file.
+
+
+### basic loop problems in java
+
+Average
+```java
+double total = 0;
+int count = 0;
+while (in.hasNextDouble())
+{
+   double input = in.nextDouble();
+   total = total + input; 
+   count++;
+}
+double average = 0; 
+if (count > 0) 
+{ 
+   average = total / count; 
+}
+```
+
+counting matches (counting number of spaces)
+```java
+int spaces = 0;
+for (int i = 0; i < str.length(); i++)
+{
+   char ch = str.charAt(i);
+   if (ch == ' ')
+   {
+      spaces++;
+   }
+}
+```
+
+finding the first match
+```java
+boolean found = false;
+char ch = '?';
+int position = 0;
+while (!found && position < str.length())
+{
+   ch = str.charAt(position);
+   if (ch == 'A' || ch == 'a') { found = true; }
+   else { position++; }
+}
+```
+
+Prompt user until match is found
+```java
+boolean valid = false;
+double input = 0;
+while (!valid)
+{
+   System.out.print("Please enter a positive value < 100: ");
+   input = in.nextDouble();
+   if (0 < input && input < 100) { valid = true; }
+   else { System.out.println("Invalid input."); }
+}
+```
+
+Find largest value
+```java
+double largest = in.nextDouble();
+while (in.hasNextDouble())
+{
+   double input = in.nextDouble();
+   if (input > largest)
+   {
+      largest = input;
+   }
+}
+
