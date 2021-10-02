@@ -1,7 +1,27 @@
 
 # Java
 
+Java Code is compiled to .class files (not binary files) which are interpretted as bytecode by the Java Virtual Machine (JVM). It is compiled down to bytecode, and the bytecode is interpretted by the JVM; so, it is both a compiled and interpretted language, technically.
+
+No operator overloading in Java (can't redefine the * operator, for example, to mean something). Although, the + operator can be used to concatenate Strings (the single exception in Java of an operator having non-expected behavior).
+
+Implementation Indendence: e.g. Java int is ALWAYS 32bits.
+
+No pointers in Java. Instead, there are "Java references", which get used all the time. These behave like pointers but aren't pointers. These will be discussed later.
+
+Version numbers in Java: "java 5.0" is actually "Jdk1.5"... Jdk1.8 was the biggest release in Java. Jdk1.8 includes the Streams API and Lambdas. With the introduction of Java 9.0, they started using modules instead of packages. The SDK was getting bloated. So, they decided to chop it up into modules. A lot of shops do not use Java 9.0 and above. Java 9.0 is not backwards compatible.
+
 Benefits of Java: safety and portability. The safety features of the Java language ensure that a program is terminated if it tries to do something unsafe. The same Java program will run, without change, on Windows, UNIX, Linux, or Macintosh. In order to achieve portability, the Java compiler does not translate Java programs directly into CPU instructions. Instead, compiled Java programs contain instructions for the Java virtual machine, a program that simulates a real CPU. 
+
+### Heap Memory
+
+```static``` methods load when the program starts. Static memory holds all the necessarily imported tools (classes and their static methods).
+
+There's also a section of memory called the ```Heap``` (an upside down tree). It is a data structure that is self-balancing and ordered. Heap memory is set aside and used to store variables in memory during runtime.
+
+As a Java programmer, your job is to instantiate objects from classes (defined in the SDK or a 3rd party library or by you) on the heap and then manipulate and manage them. Though, still you need to begin in the static context. Static memory is more "expensive" than heap memory because it's always fully loaded when the program initializes. So, you don't want to put everything in static memory. Since we must begin in static memory, we must begin with a "driver". Thus, the driver can be seen as the class handle of the program being run.
+
+The garbage collector of the JVM will deallocate memory off the heap as variables fall out of scope.
 
 ### basics
 basic program
@@ -41,6 +61,8 @@ Note, each statement ends in a semicolon (;). Forgetting to type a semicolon is 
 
 A sequence of steps that is unambiguous, executable, and terminating is called an <ins>algorithm</ins>.
 
+Note, by default ```java.lang.*``` is always imported. String is located in this package.
+
 ### Errors
 
 <ins>Compile-time error</ins>: something is wrong according to the rules of the language. Detected by compiler.
@@ -66,6 +88,57 @@ The statement above is a <ins>declaration</ins> (specification of a variable and
 Variable names must begin with a letter or underscore (_). Remaining characters must be letters, numbers, or underscores. Use upper case letters to denote word boundaries.
 
 Java uses camelCase for variable names. Variable names are case-sensitive, and reserved words cannot be used for variable names (e.g. ```double``` or ```class```). It is a java programmer convention that Class names begin with a capital letter, while variable names begin with a lower-case letter.
+
+### Nomenclature standards
+
+Class names are ```UpperCase```
+
+Constants and enums are ```ALL_UPPER_CASE```
+
+Everything else is ```lowerCamelCase```
+
+One exception for lowerCamelCase is the constructor method for a class, which must be named the same as the Class 
+
+```java
+// upper case
+public class Person {};
+
+// all upper case
+private final int MAX_OCCUPANCY;
+public enum Day {SUNDAY,MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY};
+
+// lower case
+private int nValue; //primitive
+private double calcArea(double dWidth, double dHeight); //another primitive
+private String strFirstName; //object
+```
+
+try to add an ```s``` to the end of a variable name for a local array or collection. This lets an IDE know this object is a collection
+```java
+boolean[] bAnswers;
+String[] strCountries;
+```
+
+### Hungarian Notation (optional)
+
+Some people add a short prefix to denote the type of an object/primitive:
+
+|Type	|example variable name |
+| :---        |    :----   |     
+| boolean | bFlag|
+| byte | yAge|
+|char | cFirst|
+|short | sRosterSize|
+|int | nStudent; nC|
+| long | lPopulation |
+| float | fPrice|
+| double | dDistanceToMoon|
+| String | strFirstName |
+| Date | datEncounter|
+
+primitive variables always have one letter prefix (e.g. ```nCounter```).
+Object-references have a three letter prefix (e.g. ```strName```).
+Arrays and collections always have s postfix (e.g. ```strNames```).
 
 ### Assignment
 
@@ -135,6 +208,28 @@ public class Volume1
 
 For extremely large numbers, see ```BigInteger``` or ```BigDecimal``` classes in ```java.math``` package.
 
+The Java primatives (integers):
+|Type	|Signed | Bits| Bytes| min | max |
+| :---        |    :----   |     :----   |   :----   |   :----   | :----   | 
+| byte | signed | 8 | 1 | -2^7 (-128)| 2^7-1 (+127) |
+| short | signed | 16 | 2 | -2^15 (-32768)| 2^15-1 (+32767) |
+| int | signed | 32 | 4 | -2^31 (21474833648)| 2^31-1 (+2147483647) |
+| long | signed | 64 | 8 | -2^63 (-9.23E18)| 2^63-1 (+9.23E18) |
+
+Java stores integers: -2^(bits-1) to 2^(bits-1)-1
+
+Other Java primitives
+|Type	|Signed | Bits| Bytes| min | max |
+| :---        |    :----   |     :----   |   :----   |   :----   | :----   | 
+| boolean | N/A | 1 | 1 | false | true |
+| char | unsigned unicode | 32 | 4 | 0 (\u0000)| 2^16-1 (\uffff) |
+| float | signed exponent (and mantissa) | 32 | 4 |  +-1.4E-45 |  +-3.4E38 (6-8 significant digits of accuracy)|
+| double | signed exponent (and mantissa) | 64 | 8 | +-4.94E-324 | +-1.798E308 (14-15 significant digits of accuracy)|
+
+### Wrapper Classes
+
+Every primitive in java has a corresponding wrapper class (e.g. ```Double``` class for ```double``` primitive, ```Integer``` for ```int```, ```Boolean``` for ```boolean```, ```Character``` for ```char```). These can be used in place of primitives where you must use a primitive. Moreover, some data structures require use of objects; as an example, an Arraylist object must accept objects, and so you would need to provide Integer type objects to get a list of integers.
+
 ### Quick Advice
 
 Avoid using "Magic Numbers"; i.e. store numbers into variables, and use the variables in expressions, rather than arbitarily including numbers in expressions.
@@ -155,6 +250,23 @@ To deal with round off errors, it is recommended to do rounding. Or, display the
 ```java
 int items = 0;
 items++;
+```
+
+### Prefix and Postfix Unary Operators
+
+When a prefix expression (e.g. ```++nX``` or ```--nX```) is used in an expression, the value returned is the value calculated after the prefix operator is applied.
+When a postfix expression (e.g. ```++nX``` or ```--nX```) is used in an expression, the value returned is the value calculated before the postfix operator is applied.
+
+```java
+// prefix
+int nX = 0;
+int nY = 0;
+nY = ++nX; //result: nY=1, nX=1
+
+// postfix
+int nX = 0;
+int nY = 0;
+nY = nX++; //result: nY=0, nX=1
 ```
 
 ### Division with floats, ints
@@ -921,4 +1033,846 @@ while (in.hasNextDouble())
       largest = input;
    }
 }
+```
 
+### Object vs primitive
+
+need to use ```new``` keyword to call the constructor and create an object in the heap memory.
+```java
+Card cardKS = new Card('K','S',10)
+```
+
+Creating an object on the heap creates a Java reference, a 64 bit memory address
+```java
+//e.g. Java Reference called cardKS holding a value: 7FFF_5FBF_8601_84AC 
+```
+
+### keywords
+
+reserved keywords in Java (many similar to C/C++/C#)
+
+```
+abstract
+continue
+for
+new
+switch
+assert***
+default
+goto*
+package
+synchronized
+boolean
+do
+if
+private
+this
+break
+double
+implements
+protected
+throw
+byte
+else
+import
+public
+throws
+case
+enum****
+instanceof
+return
+transient
+catch
+extends
+int
+short
+try
+char
+final
+interface
+static
+void
+class
+finally
+long
+strictfp**
+volatile
+const*
+float
+native
+super
+while
+
+*	 	not used
+**	 	added in 1.2
+***	 	added in 1.4
+****	 	added in 5.0
+```
+
+## Methods
+
+Methods take the structure of (typically) ```public static``` (described later) with the ```returnType```, ```methodName(param1type param1, param2type param2, ...)```. If the function returns nothing, for example a function that mutates an object or prints out a message, the keyword ```void``` is used to designate nothing is returned by the method.
+
+```java
+public static returnType methodName(parameterType parameterName, ...)
+{
+    //method body
+}
+```
+e.g.
+```java
+public static String getHelloStr(int duplications)
+{
+    String strFullHello = ""
+    for (int i = 0; i < duplications; i++) {
+        strFullHello += "Hello";
+    }
+    return strFullHello
+}
+
+public static void sayHello(int duplications)
+{
+    for (int i = 0; i < duplications; i++) {
+        System.out.println("Hello");
+    }
+}
+```
+
+### javadoc conventions for methods
+
+Copied from Big Java Late Objects Ed 2:
+
+"Whenever you write a method, you should comment its behavior. Comments are for human readers, not compilers. The Java language provides a standard layout for method comments, called the javadoc convention"
+
+```java
+/**
+   Computes the volume of a cube.
+   @param sideLength the side length of the cube
+   @return the volume
+*/
+public static double cubeVolume(double sideLength)
+{
+   double volume = sideLength * sideLength * sideLength;
+   return volume;
+} 
+```
+
+"Method comments explain the purpose of the method, the meaning of the parameter variables and return value, as well as any special requirements. 
+
+Comments are enclosed in /** and */ delimiters. The first line of the comment describes the purpose of the method. Each @param clause describes a parameter variable and the @return clause describes the return value.
+
+Note that the method comment does not document the implementation (how the method carries out its work) but rather the design (what the method does). The comment allows other programmers to use the method as a “black box”."
+
+Note, In Java, a method can never change the contents of a variable that was passed as an argument.
+
+### (Formal) Parameters vs Arguments
+
+(Formal) Parameters are the variables created for receiving the method's arguments. Thus, parameters refer to the object within the function call, while the arguments refer to the specfic values are thare supplied to the method when it is "invoked" or "called".
+
+### Return Values
+
+The ```return``` statement terminates a method call and yields the method result.
+
+Note, it is a compile-time error if some branches of a method return a value and others do not. For example:
+
+```java
+public static int sign(double number)
+{
+    if (number < 0) { return -1; }
+    if (number > 0) { return 1; }
+    // Error: missing return value if number equals 0
+}
+```
+
+### methods tips
+
+Keep them short; i.e., as a general rule of thumb, a single function should be able to fit on a single page. If it is longer, it should probably be abstracted more.
+
+A <ins>stub</ins> method is a method that returns a simple value that is sufficient for testing another method.
+
+### Variable Scope
+
+The scope of a variable is the part of the program in which it is variable. For example, a method's parameter's scope would be the entirety of the method. A variable defined within a method would be called a <ins>local variable</ins>.
+
+Two local or parameter variables can have the same name, provided that their scopes do not overlap.
+
+```java
+public static void main(String[] args)
+{
+    int sum = 0;
+    for (int i = 1; i <= 10; i++>)
+    {
+        sum = sum + i;
+    }
+    for (int i = 1; i <= 10; i++>)
+    {
+        sum = sum + i;
+    }
+    System.out.println(sum);
+}
+
+```			
+
+It is not legal to declare two variables with the same name in the same method in such a way that their scopes overlap. For example, the following is not legal: 
+
+```java
+public static int sumOfSquares(int n)
+{
+    int sum = 0;
+    for (int i = 1; 1 <= n; i++)
+    {
+        int n = i * i;  //error
+        sum = sum + n;
+    }
+    return sum;
+}
+```
+
+## Arrays
+
+To use arrays, import ```java.util.Arrays```.
+```java
+import java.util.Arrays;
+```
+
+An array collects a sequence of values of the same type. These types can be primitives or objects.
+
+```java
+// declaring array of ints that will hold 10 int values
+new int[10];
+
+// declaring array of String objects that will hold 20 String values
+new String[20];
+
+// declaring array of doubles that will hold 10 double values
+new double[10];
+```
+
+Declaring new array objects
+```java
+// creating an array of doubles by only specifying size (empty)
+double[] values = new double[5];
+
+// creating an array of doubles by providing an array of doubles
+double[] values = {1.2, 20.0, 153.0, 7.0, 7.15};
+```
+
+Accessing objects in an array with indexing
+```java
+// accessing the 3rd item
+dThirdValue = values[2];
+
+// updating 4th element
+values[3] = dNewValue;
+```
+
+Access the array's size to make sure arrays are not indexed out of bounds. An error is thrown if the index falls outside of ```[0,values.length]```. Make us of the array variable ```array.length``` to determine the size of the array.
+
+Typically an array will be partially filled in the sense that it will contain elements but not have reached its max size. With a partially filled array, keep a companion variable for the current size.
+
+### Array References
+
+An array reference specifies the location of an array. Copying the reference yields a second reference to the same array. Use the enhanced for loop if you do not need the index values in the loop body. 
+
+```java
+int[] scores = { 10, 9, 7, 4, 5 };
+int[] values = scores; // Copying array reference 
+// scores also points to the object {10,9,7,4,5}
+```
+
+### Enhanced for loop
+
+You can use the enhanced for loop to visit all elements of an array.
+
+```java
+double total = 0; 
+for (double element : values)
+{
+    total = total + element;
+}
+```
+
+### Typical array tasks
+filling
+```java
+for (int i = 0; i < values.length; i++)
+{
+    values[i] = i * i;
+}
+```
+
+Removing an element from an array. If the order of the array does not matter, replace the item to be deleted with the last item in the list, and decrement the companion variable designating the size of the list. If the order of the list matters, it's more complicated. Then, when an item is removed, we have to move each adjacent item to the right over to the left one position.
+
+When inserting an element, you need to do the opposite. Start at the last item in the list and move it one index to the right. Keep doing this for successive items until you get to the location where you're trying to insert a new item.
+
+If swapping elements, use a temporary variable.
+
+To make a true copy of an array, rather than just copying the reference to same array, use ```Arrays.copyOf(array_name,n)``` where ```array_name``` is the name of the array object and ```n``` is the allocated size of the new array (and to copy the first ```n``` values from the array to new array).
+
+### input boilerplate
+
+```java
+double[] inputs = new double[INITIAL_SIZE];
+int currentSize = 0;
+while (in.hasNextDouble())
+{
+    // Grow the array (double its size) if it has been completely filled
+    if (currentSize >= inputs.length)
+	{
+	    inputs = Arrays.copyOf(inputs, 2 * inputs.length); // Grow the inputs array
+	}
+inputs[currentSize] = in.nextDouble();
+currentSize++;
+}
+//When you are done, you can discard any excess (unfilled) elements: 
+inputs = Arrays.copyOf(inputs, currentSize);
+```
+
+### Array Sorting
+
+Java has built in methods for sorting.
+```java
+Arrays.sort(values); // if array is full
+Arrays.sort(values,0,currentSize); // if array is partially full
+```
+
+### Arrays with methods
+
+Can take arrays as a parameter. Can also return arrays.
+
+```java
+public static void multiply(double[] values, double factor)
+{
+   for (int i = 0; i < values.length; i++)
+   {
+      values[i] = values[i] * factor;
+   }
+}
+
+public static int[] squares(int n)
+{
+    int[] result = new int[n];
+    for (int i = 0; i < n; i++)
+    {
+        result[i] = i * i;
+    }
+    return result;
+}
+```
+
+Use the ```...``` keyword to specify variable number of input arguments
+```java
+public void sum(int... values)
+{
+   int total = 0;
+   for (int i = 0; i < values.length; i++) // values is an int[]
+   {
+      total = total + values[i];
+   }
+   return total;
+}
+```
+
+### Two-dim arrays (N-dim arrays)
+
+Can create two dimensional arrays.
+```java
+final int COUNTRIES = 8;
+final int MEDALS = 3;
+int[][] counts = new int[COUNTRIES][MEDALS];
+//Alternatively, you can declare and initialize the array by grouping each row: 
+int[][] counts = 
+{ 
+    { 0, 3, 0 },
+	{ 0, 0, 1 }, 
+	{ 0, 0, 1 }, 
+	{ 1, 0, 0 }, 
+	{ 0, 0, 1 }, 
+	{ 3, 1, 1 },
+	{ 0, 1, 0 },
+	{ 1, 0, 1 }
+};
+```
+
+The number of rows can be accessed in ```array.length```, and the number of columns can be accessed with ```array[0].length```.
+
+Similarly, higher dimensional arrays can be specified using more brackets ```[]```.
+```java
+int[][][] rubiksCube = new int[3][3][3];
+```
+
+### Array Lists
+
+An array list stores a sequence of values whose size can change. The ArrayList class is a generic class: ArrayList<Type> collects elements of the specified type.
+
+```java
+import java.util.ArrayList;
+ArrayList<String> names = new ArrayList<String>();
+
+// add elements with ArrayList.add()
+names.add("Jeremy);
+
+```
+
+Use the ```size()``` method to obtain the current size of an array list. Use the ```get()``` and ```set()``` methods to access and set items, providing an index.
+Use the ```add()``` and ```remove()``` methods to add and remove array list elements.
+
+```java
+int i = names.size();
+name_last = names.get(i-1);
+name_last = names.set(0,"Austin");
+name_last = names.add("Angela");
+name_last = names.remove(0); //removes Austin
+```
+
+Looping with ArrayLists.
+```java
+ArrayList<String> names = . . . ;
+for (String name : names)
+{
+    System.out.println(name);
+}
+//This loop is equivalent to the following basic for loop: 
+for (int i = 0; i < names.size(); i++)
+{
+	String name = names.get(i);
+	System.out.println(name);
+}
+```
+
+Copying an ArrayList. pass the original ArrayList into the constructor
+```java
+ArrayList<String> newNames = new ArrayList<String>(names);
+```
+
+ArrayLists are objects and can be returned by a function.
+```java
+public static ArrayList<String> reverse(ArrayList<String> names)
+{
+    // Allocate a list to hold the method result
+    ArrayList<String> result = new ArrayList<String>();
+			  
+    // Traverse the names list in reverse order, starting with the last element
+    for (int i = names.size() - 1; i >= 0; i--)
+    {
+        // Add each name to the result
+        result.add(names.get(i));
+    }
+    return result;
+}
+```
+
+### Wrappers and Auto-boxing
+
+In java, you can't directly insert primitive type values (numbers, charactors or boolean values) into array lists. So, you must use these primitive types' wrapper classes
+
+| Primitive Type	| Wrapper Class |
+| :---        |    :----   |     
+| byte | Byte|
+| boolean | Bollean|
+| char | Character|
+| double | Double|
+| float | Float|
+| int | Integer|
+| long | Long | 
+|short | Short|
+
+Conversion between primitive types and the corresponding wrapper classes is automatic. This process is called auto-boxing (even though auto-wrapping would have been more consistent).
+
+For example, if you assign a double value to a Double variable, the number is automatically “put into a box” (see Figure 19).
+
+Storing Input Values in an Array List
+```java
+ArrayList<Double> inputs = new ArrayList<Double>();
+while (in.hasNextDouble())
+{
+inputs.add(in.nextDouble());
+}
+```
+
+### Array vs ArrayList
+
+If the size of a collection never changes, use an array.
+If you collect a long sequence of primitive type values and you are concerned about efficiency, use an array.
+Otherwise, use an array list.'
+
+### Note: Array/ArrayList
+
+Java syntax can be a little inconsistent:
+| Data Type	| Number of elements |
+| :---        |    :----   |     
+| Array | a.length |
+| Array List | a.size() |
+| String | a.length() |
+
+### Diamond Syntax
+
+There is a convenient syntax enhancement for declaring array lists and other generic classes. In a statement that declares and constructs an array list, you need not repeat the type parameter in the constructor. That is, you can write
+
+```java
+ArrayList<String> names = new ArrayList<>();
+
+// instead of
+ArrayList<String> names = new ArrayList<String>();
+```
+
+This is called diamond syntax because of the ```<>``` symbol that forms.
+
+## Input / Output and Exception HAndling
+
+### Reading / Writing files
+
+Use the Scanner class for reading text files.
+```java
+// create a file object
+File inputFile = new File("input.txt");
+
+// create a scanner object to read the file
+Scanner in = new Scanner(inputFile);
+
+// process the file by iterating through lines
+while (in.hasNextDouble())
+{
+    double value = in.nextDouble();
+    //Process value.
+}
+```
+
+With a Scanner, use ```next()``` to read the next String that is delimited by white space.
+```java
+while (in.hasNext())
+{
+    String input = in.next();
+    System.out.println(input);
+}
+```
+
+To read char's from a file, use the ```Scanner.useDelimiter()``` method to change the delimiter for reading
+```java
+Scanner in = new Scanner(. . .);
+in.useDelimiter(""); 
+// Now each call to next returns a string consisting of a single character. Here is how you can process the characters:
+while (in.hasNext())
+{
+    char ch = in.next().charAt(0);
+    // Process ch.
+}
+```
+
+To classify character as they are read with a Scanner, use the ```Character.isDigit()``` or other Character class static methods.
+
+To read an entire line, use ```Scanner.nextLine()```.
+```java
+String line = in.nextLine();
+```
+
+Note, you can use the Scanner object to read the characters from a String:
+```java
+Scanner lineScanner = new Scanner(line);
+// Then you can use lineScanner like any other Scanner object, reading words and numbers:
+String countryName = lineScanner.next(); // Read first word
+```
+
+When writing text files, use the PrintWriter class and the print/println/printf methods.
+```java
+// if file alread exists, it is emptied before new data is written into it.
+// if the files doesn't exist, an empty file is created
+PrintWriter out = new PrintWriter("output.txt"); 
+```
+
+The ```PrintWriter``` class is an enhancement of the ```PrintStream``` class that you already know—```System.out``` is a PrintStream object. You can use the familiar ```print```, ```println```, and ```printf``` methods with any PrintWriter object:
+```java
+out.println("Hello, World!");
+out.printf("Total: %8.2f%n", total);
+```
+
+Close files when done with them.
+```java
+in.close();
+out.close();
+```
+
+### Notes
+
+Note, may need to use escape characters when specifying a path:
+```java
+File inputFile = new File("c:\\homework\\input.dat");
+```
+
+Note: ```Scanner``` uses a File object, not a String object representing the location of the file, whereas The PrintWriter does accept a String.
+To specify just a file location for the Scanner class, create a File object in-line like so:
+```java
+Scanner in = new Scanner(new File("input.txt"))
+```
+
+If a string contains the digits of a number, you use the ```Integer.parseInt``` or ```Double.parseDouble``` method to obtain the number value.
+```java
+int populationValue = Integer.parseInt(population);
+// populationValue is the integer 303824646
+
+double price = Double.parseDouble(input); 
+// price is the floating-point number 3.95 
+
+// an error will be thrown if population has any non digit characters, such as spaces. So we can use trim()
+int populationValue = Integer.parseInt(population.trim());
+```
+
+Avoid errors when reading numbers by wrapping reading the next input from Scanner with an if statement
+```java
+if (in.hasNextInt())
+{
+int value = in.nextInt();
+// ...
+}
+// also use hasNextDouble method before calling nextDouble.
+```
+
+Reading an entire file into a list: use the Files class, which provides methods to work with files and directories. The Files class requires that you specify file paths as Path objects. The Paths.get method turns a string containing a file path into such an object. Use these commands:
+```java
+String filename = "my\\file\\path";
+List<String> lines = Files.readAllLines(Paths.get(filename));
+String content = new String(Files.readAllBytes(Paths.get(filename)));
+```
+
+### Formatting Output
+
+Format Flags
+| Flag	| Meaning | Example |
+| :---        |    :----   |     :----   | 
+| - | left alignment | 1.23 followed by spaces   |
+| 0 | Show leading zeroes | 001.23  |
+| + | Show a plus sign for positive numbers | +1.23  |
+| ( | Enclose negative numbers in parentheses | (1.23)  |
+| , | Show decimal separators | 12,300 |
+| ^ | Convert letters to uppercase | 1.23E+1 |
+
+Format Types
+| Code	| Type | Example |
+| :---        |    :----   |     :----   | 
+| d | Decimal integer | 123  |
+| f | fixed floating-point | 12.30  |
+| e | exponential floating-point | 1.23e+1  |
+| g | General floating-point (exponential notation is used for very large or very small values) | 12.3  |
+| s | String | Tax: |
+
+### Command Line Arguments
+
+Programs that start from the command line receive the command line arguments in the main method:
+```public static void main(String[] args)```
+
+Consider the example
+```bash
+java ProgramClass -v input.dat
+```
+
+Then, the following elements exist in args
+```java
+args[0] //   "-v"
+args[1] //   "input.dat"
+```
+
+### Throwing Exceptions
+
+To signal an exceptional condition, use the throw statement to throw an exception object. Do so when an error condition is encountered (and in such a situation you want the program to ultimately terminate after perhaps doing additional tasks). Moreover, when you throw an exception, processing continues in an exception handler.
+
+```java
+if (amount > balance)
+{
+    throw new IllegalArgumentException("Amount exceeds balance");
+}   
+```
+
+Place the statements that can cause an exception inside a try block, and the handler inside a catch clause (try / catch / catch... paradigm).
+```java
+try 
+{ 
+String filename = . . .;
+Scanner in = new Scanner(new File(filename));
+String input = in.next();
+int value = Integer.parseInt(input);
+//. . .
+} 
+catch (IOException exception) 
+{
+    exception.printStackTrace();
+} 
+catch (NumberFormatException exception) 
+{
+    System.out.println(exception.getMessage());
+} 
+```
+
+### Checked Exceptions
+
+In java, exceptions that you can throw and catch fall into three categories:
+
+<ins>Internal Errors</ins>: descendants of the type ```Error```. These are fatal errors that happen rarely, and these are seldom thought about.
+<ins>Unchecked exceptions</ins>: descendents of the type ```RuntimeException``` (e.g. ```IndexOutOfBoundsException```,```IllegalArgumentException```) indicate errors in your code.
+<ins>Checked exceptions</ins>: these exceptions indicate that something has gone wrong for some external reason beyond your control.
+
+Checked exceptions are due to external circumstances that the programmer cannot prevent. The compiler checks that your program handles these exceptions.
+
+Add a throws clause to a method that can throw a checked exception.
+```java
+public static String readData(String filename) throws FileNotFoundException 
+{
+    File inFile = new File(filename);
+    Scanner in = new Scanner(inFile);
+	//. . .
+}
+```
+
+The throws clause signals the caller of your method that it may encounter a FileNotFoundException. Then the caller needs to make the same decision—handle the exception, or declare that the exception may be thrown. 
+
+### Closing Resources
+
+The ```try-with-resources``` statement ensures that a resource is closed when the statement ends normally or due to an exception.
+```java
+try (PrintWriter out = new PrintWriter(filename))
+{
+    writeData(out);
+} // out.close() is always called
+```
+
+When the try block is completed, the close method is called on the variable. If no exception has occurred, this happens when the writeData method returns. However, if an exception occurs, the close method is invoked before the exception is passed to its handler.
+
+You can declare multiple variables in a try-with-resources statement, like this:
+```java
+try (Scanner in = new Scanner(inFile); PrintWriter out = new PrintWriter(outFile))
+{
+    while (in.hasNextLine())
+	{
+        String input = in.nextLine();
+		String result = process(input);
+		out.println(result);
+	}
+} // Both in.close() and out.close() are called here
+```
+
+### Assertions
+
+Throw an assertion when you want to assert that something should be true at all times in a particular program location.
+```java
+public double deposit(double amount)
+{
+    assert amount >= 0;
+    balance = balance + amount;
+}
+```
+
+When running a java file, assertion checking is disabled by default. To execute a program with assertion checking turned on use:
+```bash
+java -enableassertions MainClass
+```
+
+### Application: Handling Input Errors
+
+When designing a program, ask yourself what kinds of exceptions can occur. For each exception, you need to decide which part of your program can competently handle it.
+
+```java
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.NoSuchElementException;
+
+/**
+   This program processes a file containing a count followed by data values.
+   If the file doesn't exist or the format is incorrect, you can specify 
+   another file.
+
+   Five files are provided:
+
+   good.txt  bad1.txt   bad2.txt   bad3.txt   bad4.txt
+   --------  --------   --------   --------   --------
+   10        10         ten        10         10  
+   1         1          1          one        1  
+   2         2          2          2          2  
+   3         3          3          3          3  
+   4         4          4          4          4  
+   5         5          5          5          5  
+   6         6          6          6          6  
+   7         7          7          7          7  
+   8         8          8          8          8  
+   9         9          9          9          9  
+   10                   10         10         10 
+                                              11
+*/
+public class DataAnalyzer
+{
+   public static void main(String[] args)
+   {
+      Scanner in = new Scanner(System.in);
+
+      // Keep trying until there are no more exceptions
+
+      boolean done = false;
+      while (!done)
+      {
+         try
+         {
+            System.out.print("Please enter the file name: ");
+            String filename = in.next();
+            
+            double[] data = readFile(filename);
+
+            // As an example for processing the data, we compute the sum
+
+            double sum = 0;
+            for (double d : data) { sum = sum + d; }
+            System.out.println("The sum is " + sum);
+
+            done = true;
+         }
+         catch (FileNotFoundException exception)
+         {
+            System.out.println("File not found.");
+         }
+         catch (NoSuchElementException exception)
+         {
+            System.out.println("File contents invalid.");
+         }
+         catch (IOException exception)
+         {
+            exception.printStackTrace();
+         }
+      }
+   }
+
+   /**
+      Opens a file and reads a data set.
+      @param filename the name of the file holding the data
+      @return the data in the file
+   */
+   public static double[] readFile(String filename) throws IOException
+   {
+      File inFile = new File(filename);
+      try (Scanner in = new Scanner(inFile))
+      {
+         return readData(in);
+      }
+   }
+
+   /**
+      Reads a data set.
+      @param in the scanner that scans the data
+      @return the data set
+   */
+   public static double[] readData(Scanner in) throws IOException
+   {
+      int numberOfValues = in.nextInt(); // May throw NoSuchElementException
+      double[] data = new double[numberOfValues];
+
+      for (int i = 0; i < numberOfValues; i++)
+      {
+         data[i] = in.nextDouble(); // May throw NoSuchElementException
+      }
+
+      if (in.hasNext())
+      {
+         throw new IOException("End of file expected");
+      }
+      return data;
+   }
+}
+```
