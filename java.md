@@ -1876,3 +1876,291 @@ public class DataAnalyzer
    }
 }
 ```
+
+## Classes, Constructors
+
+### Constructors
+
+Every class has a built-in constructor. The default constructor is overriden if you define a constructor for the class.
+
+The constructor method has the same name as the class (Very important - otherwise it is not a constructor).
+
+It is the only method that is allowed to be capitalized (it must match the class name, which is capitalized).
+
+If you don't define a constructor, a default no-arg constructor is implied that will set fields to zero, or null.
+
+If you define any constructor, then the default constructor is not available to you.
+
+Creating an object is called <ins>instantiation</ins>.
+
+```java
+
+// by default, java.lang.* is always imported
+// import java.lang.*;
+
+public class Intern {
+
+    private String name;
+
+}
+```
+
+Every object in Java ```extends``` the Object class (the "cosmic superclass")
+
+```java
+
+// by default, java.lang.* is always imported
+// import java.lang.* is hidden from you
+import java.lang.*;
+
+// "extends Object" is hidden from you
+public class Intern extends Object {
+
+    private String name;
+
+    // default constructor is hidden from you
+    public Intern() {
+
+    }
+}
+```
+
+As soon as we type out the constructor ourselves, we overwrite the hidden default constructor. You define multiple constructors; for example, one constructor that accepts no parameters, one constructor that accepts one parameter.
+```java
+// POJO: Plain old java object
+public class Intern {
+
+    private String name;
+
+    public Intern(String name) {
+        this.name = name;
+    }
+
+    public String getName(){
+        return this.name;
+    }
+
+    public void setName(String name){
+        this.name = name;
+    }
+}
+```
+
+Note, you are only instiating an object when the ```new``` keyword is used; the only exception is a String literal (equivalent to ```new String("Alice")```).
+
+```java
+// note: firstIntern is a 64 bit memory address to an object instantiated on the heap.
+Intern firstIntern = new Intern("Alice");
+
+// note: you do not necessarily need a reference for an object you are instantiating.
+// this prints the memory address of the new object created on the heap.
+System.out.println(new Intern("David")); 
+```
+
+### Passing (primitives vs objects)
+
+(1) Everything is passed by value in Java; however, when you pass an object reference, you are making
+a copy of the memory address. So, when you give the method the memory address, you are giving that method
+the ability to mutate that object. When passing a primitive, you are not mutating anything; the original
+primitive stays the same value.
+(2) When you pass an object to a method, you are passing a copy of the memory address to that method.
+
+
+
+```java
+
+// ... in the main method
+int nNumber = 5;
+multByFive(nNumber);
+System.out.println("nNumber: " + nNumber)
+// ...
+
+// NOTE: nMNumber EVALUATES TO 5. NOT 25
+// this is copies of primitives are made when passed into methods
+
+private static void multByFive(int nParam){
+    nParam = nParam * 5;
+}
+
+```
+
+```java
+
+// ... in the main method
+Rectangle recSquare = new Rectangle(1,1,10,10);
+//0x67AB
+doubleRec(recSquare);
+System.out.println("recSquare: " + recSquare)
+// ...
+
+// NOTE: this mutates recSquare!!!
+// this is because the memory address is copied into the method
+// which points to the same object on the heap.
+// like as if you would send someone a copy of your credit card number
+
+
+private static void doubleRec(Rectangle rec){
+    rec.setSize(rec.width *2, rec.height*2)
+}
+
+```
+
+
+
+## Strings
+
+Strings are object. Can initialize them without the ```new``` keyword, which makes them special.
+
+Strings are immutable (discussed later).
+
+Strings may be pooled. In other words, if you create two distinct String objects that hold the same value (e.g. "Austin", java will decide to have both object references be the same--point to the same object in memory; this is to save memory). 
+
+\+ operator is overloaded for the String object.
+
+```==``` compares memory addresses. For 99% of the time, when two distinct objects are compared this will evaluate to false. The exception is String objects that have been pooled, or primitives (e.g. ```51.20 == 51.20```)
+
+```java
+// consider this code
+
+String strSum = "";
+
+
+// this code creates 100 objects on the heap
+// what is preferred is to use a StringBuilder, an object that allows you to mutate
+// a String
+
+StringBuilder stringBuilder = new StringBuilder();
+for (int nC = 0; nC < 100; nC++) {
+    stringBuilder.append(nC)
+}
+
+String strSum = stringBuilder.toString();
+```
+
+## Static Context
+
+Uses for Static: Driver main, Driver helper-methods, Utility methods, Constants.
+
+The Static context is loaded at the beginning of runtime: static methods, static variables will be loaded at the start of runtime, and one copy of them will get made.
+
+In the static context, you need a class to act as the Driver. It needs a ```main()``` method. It is normal for the Driver class to have private static method: private meaning it can only be seen by Driver (because only the Driver class needs to see that method), and static because it is intended to be used from the Class, not from an instance of that class (an instantiated object that we created on the heap).
+
+Note, if you wanted to create a class to house methods, and it would never make sense to instantiate an object of the class, you could define a private constructor for that class:
+```java
+public class Convert{
+    
+    private Convert() {
+    }
+
+    public static double tempToMetric(double dFar){
+        // calc stuff
+        return (dFar-32) * 5.0/9.0;
+    }
+
+    public static double tempToImperial(double dCel){
+        // calc stuff
+        return dCel * 9.0/5.0 + 32;
+    }
+}
+```
+
+Trying to instantiate the class would result in an error: ```Math math = new Math();```
+
+Mentioned above, we might want to make constants static:
+```java
+public class Intern {
+
+    // note all interns might belong to the same company. So this variable
+    // would be found in every instance of a student.
+
+    // public final String company = "Apple Computer";
+
+    // In an effort to be more efficient we can and should declare it static,
+    // a variable that belongs to the blueprint rather than to every instance
+    // of the class. Now, it being static means there will only be one copy
+    // of it.
+
+    public final static String company = "Apple Computer";
+}
+
+```
+
+### Implicit, Explicit Parameters
+
+In the function call ```strName.indexOf(cSpace);```, cSpace is an explicit reference, and strName is an implicit reference. strName is implicitly passed into the method. So, instance methods will have an implicit parameter (the object instance).
+
+If a method is called from the class (from the static context), as in a static method, there will be no implicit reference: ```Math.pow(2,3)```. So, static methods won't have implicit parameters.
+
+## Packages
+
+<ins>Packages</ins>: a collection of classes with a related purpose.
+
+Remember ```java.lang.*``` is imported always automatically. The SDK contains many additional packages, however.
+
+Import library classes by specifying the package and class name:
+```java
+import java.awt.Rectangle;
+```
+
+You can use the fully qualifed packages in-situ like so
+```java
+java.awt.Rectangle rect = new java.awt.Rectangle(1,3,56,34);
+```
+
+But this is uncommon. Instead it is more common to do
+```java
+import java.awt.Rectangle;
+
+// . . .
+
+Rectange\le rect = new Rectangle(1,3,56,34)
+```
+
+### Casting Primitives
+
+```java
+
+// can create floats by directly casting or appending an f:
+float fValue = 89393.0008f;
+float fValue = 89393.0008F;
+float fValue = (float) 89393.0008;
+
+// can create longs by directly casting or appending an L:
+long lValue = 8984651684351381384l; // works, but VERY BAD PRACTICE because "l" hard to read!
+long lValue = 8984651684351381384L; // recommended
+long lValue = (long) 8984651684351381384; // recommended
+
+// casting from integer to byte can be very weird and unexpected
+// consider 393.
+// consider the binary rep: 0000 0000 0000 0000 0000 0001 1000 1001
+// casting to a byte lumps off (truncates) the leading however
+// many bits until 8 bits are obtained:
+//                                                     1000 1001
+// result: -119
+int nNumber = 393;
+byte yNumber = (byte) nNumber;
+```
+
+### Techniques: reading input
+
+Each Wrapper class has a parse function:
+```java
+Integer.parseInt(String str);
+Double.parseDouble(String str);
+Byte.parseByte(String str);
+Boolean.parseBoolean(String str);
+Character.parseCharacter(String str); // need to confirm
+```
+
+```System.in``` has minimal set of features -- can only read one byte at a time
+
+```Scanner``` was added in java 5.0 to read keyboard input in a convenient manner. It has helpful methods like ```nextDouble(), nextLine(), next()```, which reads a double, a line (until user hits enter), and a word (until any white space), respectively.
+
+There's a Random class that is helpful.
+```java
+import java.util.Random;
+Random ran = new Random();
+int n = ran.nextInt();
+double d = ran.nextDouble();
+int n = ran.nextInt(20); // 0-19
+```
