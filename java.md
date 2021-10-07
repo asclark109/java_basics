@@ -1673,6 +1673,10 @@ args[1] //   "input.dat"
 
 ### Throwing Exceptions
 
+Exceptions in Java
+
+![alt text](pics\exceptions_tree.png "Title")
+
 To signal an exceptional condition, use the throw statement to throw an exception object. Do so when an error condition is encountered (and in such a situation you want the program to ultimately terminate after perhaps doing additional tasks). Moreover, when you throw an exception, processing continues in an exception handler.
 
 ```java
