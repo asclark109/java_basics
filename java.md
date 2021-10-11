@@ -2168,3 +2168,933 @@ int n = ran.nextInt();
 double d = ran.nextDouble();
 int n = ran.nextInt(20); // 0-19
 ```
+
+
+## OOP
+
+A class describes a set of objects with the same behavior.
+
+The set of all methods provided by a class, together with a description of their behavior, is called the <ins>public interface</ins> of the class. 
+
+Every class has a public interface: a collection of methods through which the objects of the class can be manipulated.
+			
+The process of providing a public interface, while hiding the implementation details, is called <ins>encapsulation</ins>. Encapsulation is the act of providing a public interface and hiding the implementation details.
+
+Encapsulation enables changes in the implementation without affecting users of a class.
+
+### Implementing a Simple Class
+
+The methods of a class define the behavior of its objects.
+
+The methods of a class define the behavior of its objects.
+
+An object stores its state in instance variables. An instance of a class is an object of the class. Thus, an instance variable is a storage location that is present in each object of the class. You specify instance variables in the class declaration:
+
+```java
+public class Counter {  
+       private int value;
+       // ...
+}
+```
+
+An instance variable declaration consists of the following parts: 
+•A modifier (private) 
+•The type of the instance variable (such as int) 
+•The name of the instance variable (such as value) 
+
+Each object of a class has its own set of instance variables.
+
+The methods that you invoke on an object are called <ins>instance</ins> methods. An instance method can access the instance variables of the object on which it acts.
+
+```java
+public int getValue()
+{
+    return value;
+}
+```
+
+A private instance variable can only be accessed by the methods of its own class.
+
+### Class Public Interface
+
+When designing a class, you start by specifying its public interface. The public interface of a class consists of all methods that a user of the class may want to apply to its objects. You can use method headers and method comments to specify the public interface of a class.
+
+```java
+
+/**
+    A simulated cash register that tracks the item
+    count and the total amount due.
+*/
+public class CashRegister
+{
+    //private data—see Section 8.4
+
+    /**
+        Adds an item to this cash register.
+        @param price the price of this item
+    */
+    public void addItem(double price)
+    { 
+        //implementation
+    }
+    
+    /**
+        Gets the price of all items in the current sale.
+        @return the total price
+    */
+    public double getTotal()
+    { 
+        //implementation
+    }
+    
+    /**
+        Gets the number of items in the current sale.
+        @return the item count
+    */
+    public int getCount()
+    { 
+        //implementation
+    } 
+    
+    /**
+        Clears the item count and the total.
+    */
+    public void clear()
+    { 
+        //implementation
+    }
+}
+```
+
+The method declarations and comments make up the <ins>public interface</ins> of the class. The data and the method bodies make up the <ins>private implementation</ins> of the class. Note that the methods of the CashRegister class are instance methods. They are not declared as static. You invoke them on objects (or instances) of the CashRegister class.
+
+It is useful to classify its methods as <ins>mutators</ins> and <ins>accessors</ins>. A <ins>mutator</ins> method modifies the object on which it operates. The CashRegister class has two mutators: addItem and clear. An <ins>accessor</ins> method queries the object for some information without changing it. The CashRegister class has two accessors: getTotal and getCount. The CashRegister class has two accessors: getTotal and getCount.
+
+### Javadoc Utility
+
+The javadoc utility formats documentation comments into a neat set of documents that you can view in a web browser. It makes good use of the seemingly repetitive phrases. The first sentence of each method comment is used for a summary table of all methods of your class. The ```@param``` and ```@return``` comments are neatly formatted in the detail description of each method. If you omit any of the comments, then javadoc generates documents that look strangely empty. 
+
+You can invoke the javadoc utility from a shell window, by issuing the command ```javadoc MyClass.java```
+
+The javadoc tool is wonderful because it does one thing right: It allows you to put the documentation together with your code. That way, when you update your programs, you can see right away which documentation needs to be updated. Hopefully, you will update it right then and there. Afterward, run javadoc again and get updated information that is timely and nicely formatted.
+
+### Data Representation (private variables)
+
+Each accessor method must either retrieve a stored value or compute the result.
+
+Commonly, there is more than one way of representing the data of an object, and you must make a choice.
+
+Be sure that your data representation supports method calls in any order.
+
+### Instance Methods
+
+boiler plate:
+
+```java
+modifiers returnType methodName(paramType parameterName, ... )
+{
+    method body
+}
+
+
+// EX
+public void addItem(double price){
+    itemCount ++;
+    totalPrice = totalPrice + price;
+}
+```
+
+The object on which an instance method is applied is the implicit parameter. for instance when executing the method ```register1.addItem(1.95)```, register1 is passed in the method as an implicit parameter. That is how JVM would know which Register object's private variables we want to manipulate. In Java, you do not actually write the implicit parameter in the method declaration. For that reason, the parameter is called “implicit”. 
+
+Explicit parameters of a method are listed in the method declaration.
+
+### Tip: All Instance Variables Should Be Private; Most Methods Should Be Public
+
+It is possible to declare instance variables as public, but you should not do that in your own code. Always use encapsulation, with private instance variables that are manipulated with methods.
+
+Typically, methods are public. However, sometimes you have a method that is used only as a helper method by other methods. In that case, you can make the helper method private. Simply use the private reserved word when declaring the method.
+
+
+### Constructors
+
+A <ins>constructor</ins> initializes the instance variables of an object. The constructor is automatically called whenever an object is created with the new operator. A constructor initializes the instance variables of an object. A constructor is invoked when an object is created with the new operator.
+
+```java
+Scanner in = new Scanner(System.in);
+```
+
+The name of a constructor is the same as the class name.
+
+```java
+public class CashRegister
+{
+    . . .
+    
+    /**
+        Constructs a cash register with cleared item count and total.
+    */
+    public CashRegister() // A constructor
+    { 
+        itemCount = 0;
+        totalPrice = 0;
+    }
+}
+```
+
+A class can have multiple constructors.
+```java
+public class BankAccount
+{ 
+    . . .
+    
+    /**
+        Constructs a bank account with a zero balance.
+    */
+    public BankAccount() { . . . }
+    
+    /**
+        Constructs a bank account with a given balance.
+        @param initialBalance the initial balance
+    */
+    public BankAccount(double initialBalance) { . . . }
+}     
+```
+
+The compiler picks the constructor that matches the construction arguments.
+
+```java
+BankAccount joesAccount = new BankAccount(); 
+// Uses BankAccount() constructor
+BankAccount lisasAccount = new BankAccount(499.95); 
+// Uses BankAccount(double) constructor
+```
+
+If you do not initialize an instance variable in a constructor, it is automatically set to a default value: by default, numbers are initialized as 0, Booleans as false, and object references as null that indicates that no object is associated with the variable. This is usually not desirable, and you should initialize object references in your constructors.
+
+In this regard, instance variables differ from local variables declared inside methods. The computer reports an error if you use a local variable that has not been explicitly initialized. 
+
+If you do not supply any constructor for a class, the compiler automatically generates a constructor. That constructor has no arguments, and it initializes all instance variables with their default values. Therefore, every class has at least one constructor. If you do not supply any constructor for a class, the compiler automatically generates a constructor. That constructor has no arguments, and it initializes all instance variables with their default values. Therefore, every class has at least one constructor.
+
+```java
+public class Intern{
+    // default constructor is hidden from you
+    public Intern() {
+
+    }
+}
+```
+
+#### common errors / topics
+
+TRYING TO CALL A CONSTRUCTOR
+
+A constructor is not a method. You must use it in combination with the new reserved word:
+
+```CashRegister register1 = new CashRegister();```
+
+After an object has been constructed, you cannot invoke the constructor on that object again. For example, you cannot call the constructor to clear an object:
+
+```register1.CashRegister(); // Error```
+			
+It is true that the constructor can set a new CashRegister object to the cleared state, but you cannot invoke a constructor on an existing object. However, you can replace the object with a new one:
+
+```register1 = new CashRegister(); // OK```
+
+DECLARING A CONSTRUCTOR AS VOID
+
+Do not use the void reserved word when you declare a constructor:
+
+```public void BankAccount()  // Error—don’t use void!```
+
+This would declare a method with return type void and not a constructor. Unfortunately, the Java compiler does not consider this a syntax error.
+
+OVERLOADING
+
+When the same method name is used for more than one method, then the name is overloaded. In Java you can overload method names provided that the parameter types are different. For example, you can declare two methods, both called print:
+
+```java
+public void print(CashRegister register)
+public void print(BankAccount account)
+//When the print method is called,
+print(x);
+```
+
+rhe compiler looks at the type of x. If x is a CashRegister object, the first method is called. If x is an BankAccount object, the second method is called. If x is neither, the compiler generates an error.
+	
+We have not discussed the overloading feature. Instead, we give each method a unique name, such as printRegister or printAccount. However, we have no choice with constructors. Java demands that the name of a constructor equal the name of the class. If a class has more than one constructor, then that name must be overloaded.
+
+### Testing a Class
+
+In the long run, your class may become a part of a larger program that interacts with users, stores data in files, and so on. However, before integrating a class into a program, it is always a good idea to test it in isolation. Testing in isolation, outside a complete program, is called unit testing.
+
+To test your class, you have two choices. Some interactive development environments, such as BlueJ (http://bluej.org) and Dr. Java (http://drjava.org), have commands for constructing objects and invoking methods. Then you can test a class simply by constructing an object, calling methods, and verifying that you get the expected return values. Figure 7 shows the result of calling the getTotal method on a CashRegister object in BlueJ.
+
+Alternatively, you can write a tester class. A tester class is a class with a main method that contains statements to run methods of another class. A tester class typically carries out the following steps:
+
+1.Construct one or more objects of the class that is being tested.
+2.Invoke one or more methods.
+3.Print out one or more results.
+4.Print the expected results. 
+
+A <ins>unit test</ins> verifies that a class works correctly in isolation, outside a complete program. To test a class, use an environment for interactive testing, or write a tester class to execute test instructions.
+
+Determining the expected result in advance is an important part of testing. 
+
+```java
+/**
+   This program tests the CashRegister class.
+*/
+public class CashRegisterTester
+{
+   public static void main(String[] args)
+   {
+      CashRegister register1 = new CashRegister();
+      register1.addItem(1.95);
+      register1.addItem(0.95);
+      register1.addItem(2.50);
+      System.out.println(register1.getCount());
+      System.out.println("Expected: 3");
+      System.out.printf("%.2f%n", register1.getTotal());
+      System.out.println("Expected: 5.40");
+   }
+}
+```
+
+```java
+/**
+   A simulated cash register that tracks the item count and
+   the total amount due.
+ */
+public class CashRegister
+{
+   private int itemCount;
+   private double totalPrice;
+
+   /**
+      Constructs a cash register with cleared item count and total.
+   */
+   public CashRegister()
+   {
+      itemCount = 0;
+      totalPrice = 0;
+   }
+
+   /**
+      Adds an item to this cash register.
+      @param price the price of this item
+   */
+   public void addItem(double price)
+   {
+      itemCount++;
+      totalPrice = totalPrice + price;
+   }
+
+   /**
+      Gets the price of all items in the current sale.
+      @return the total amount
+   */
+   public double getTotal()
+   {
+      return totalPrice; 
+   }
+   
+   /**
+      Gets the number of items in the current sale.
+      @return the item count
+   */
+   public int getCount()
+   {
+      return itemCount; 
+   }
+
+   /**
+      Clears the item count and the total.
+   */
+   public void clear()
+   {
+      itemCount = 0;
+      totalPrice = 0;
+   }
+}
+```
+
+To produce a program, you need to combine the CashRegister and CashRegisterTester classes. The details for building the program depend on your compiler and development environment. In most environments, you need to carry out these steps:
+
+1.Make a new subfolder for your program. 
+2.Make two files, one for each class. 
+3.Compile both files. 
+4.Run the test program. 
+
+### Object References
+
+In Java, a variable whose type is a class does not actually hold an object. It merely holds the memory location of an object. The object itself is stored elsewhere.
+
+We use the technical term object reference to denote the memory location of an object. When a variable contains the memory location of an object, we say that it refers to an object. For example, after the statement
+
+```java
+CashRegister reg1 = new CashRegister();   
+```
+
+the variable reg1 refers to the CashRegister object that the new operator constructed. Technically speaking, the new operator returned a reference to the new object, and that reference is stored in the reg1 variable.
+
+
+### Shared References
+
+You can have two (or more) object variables that store references to the same object, for example by assigning one to the other.
+
+```java
+CashRegister reg2 = reg1;
+```
+
+Now you can access the same CashRegister object both as reg1 and as reg2.
+
+In this regard, object variables differ from variables for primitive types (numbers, characters, and boolean values). When you declare
+
+```java
+int num1 = 0;
+```
+
+Then the num1 variable holds the number 0, not a reference to the number.
+
+NOTE: Multiple object variables can contain references to the same object.
+NOTE: Primitive type variables store values. Object variables store references.
+
+When copying an object reference, you have two references to the same object.
+
+There is a reason for the difference between primitives and objects. In the computer, each primitive requires a small amount of memory. But objects can be very large. It is far more efficient to manipulate only the memory location. 
+
+### The null reference
+
+An object reference can have the special value null if it refers to no object at all. It is common to use the null value to indicate that a value has never been set. For example,
+
+```java
+String middleInitial = null; // No middle initial 
+```
+
+The null reference refers to no object. You use the == operator (and not equals) to test whether an object reference is a null reference.
+
+### ```this``` reference
+
+Every instance method receives the implicit parameter in a variable called this. For example, consider the method call
+
+```java
+reg1.addItem(2.95);
+```
+
+When the method is called, the parameter variable ```this``` refers to the same object as reg1.
+
+You don’t usually need to use the this reference, but you can. For example, you can write the addItem method like this:
+
+```java
+void addItem(double price)
+{
+    this.itemCount++;
+    this.totalPrice = this.totalPrice + price;
+}
+```
+
+Some programmers like to use the this reference to make it clear that itemCount and totalPrice are instance variables and not local variables. You may want to try it out and see if you like that style. 
+
+There is another situation where the this reference can make your programs easier to read. Consider a constructor or instance method that calls another instance method on the same object. For example, the CashRegister constructor can call the clear method instead of duplicating its code:
+```java
+public CashRegister()
+{
+    clear();
+}
+This call is easier to understand when you use the this reference:
+public CashRegister()
+{
+    this.clear();
+}
+```
+
+It is now more obvious that the method is invoked on the object that is being constructed.
+
+Finally, some people like to use the this reference in constructors. Here is a typical example:
+```java
+public class Student
+{
+    private int id;
+    private String name;
+    
+    public Student(int id, String name)
+    {
+        this.id = id;
+        this.name = name;
+    }
+}
+```
+
+The expression id refers to the parameter variable, and this.id to the instance variable. In general, if both a local variable and an instance variable have the same name, you can access the local variable by its name, and the instance variable with the this reference.
+
+You can implement the constructor without using the this reference. Simply choose other names for the parameter variables:
+
+```java
+public Student(int anId, String aName)
+{
+    id = anId;
+    name = aName;
+}
+```
+
+#### Common mistake
+
+Just as it is a common error to forget to initialize a local variable, it is easy to forget about instance variables. Every constructor needs to ensure that all instance variables are set to appropriate values. 
+
+If you do not initialize an instance variable, the Java compiler will initialize it for you. Numbers are initialized with 0, but object references—such as string variables—are set to the null reference.
+
+Of course, 0 is often a convenient default for numbers. However, null is hardly ever a convenient default for objects. Consider this “lazy” constructor for a modified version of the BankAccount class: 
+
+```java
+public class BankAccount
+{ 
+    private double balance; 
+    private String owner;  // set to null reference!
+    . . . 
+    public BankAccount(double initialBalance) 
+    { 
+        balance = initialBalance; 
+        //String owner set to null reference!
+    } 
+}
+```
+
+In this case, balance is initialized, but the owner variable is set to a null reference. This can be a problem—it is illegal to call methods on the null reference. 
+
+To avoid this problem, it is a good idea to initialize every instance variable:
+
+```java
+public BankAccount(double initialBalance) 
+{ 
+    balance = initialBalance; 
+    owner = "None";
+}
+```
+
+#### Calling one constructor from another
+
+Consider the BankAccount class outlined before. It has two constructors: a constructor without arguments to initialize the balance with zero, and another constructor to supply an initial balance. Rather than explicitly setting the balance to zero, one constructor can call another constructor of the same class instead. There is a shorthand notation to achieve this result: 
+
+```java
+public class BankAccount
+{  
+    public BankAccount(double initialBalance) 
+    {  
+        balance = initialBalance;
+    } 
+    
+    public BankAccount() 
+    {  
+        this(0);
+    } 
+    . . . 
+}
+```
+
+The command this(0); means “Call another constructor of this class and supply the value 0”. Such a call to another constructor can occur only as the first line in a constructor. 
+
+This syntax is a minor convenience. Not used much. Actually, the use of the reserved word ```this``` is a little confusing. Normally, this denotes a reference to the implicit parameter, but if this is followed by parentheses, it denotes a call to another constructor of this class. 
+
+
+### Static Variables and Methods
+
+Sometimes, a value properly belongs to a class, not to any object of the class. You use a static variable for this purpose. A static variable belongs to the class, not to any object of the class.
+
+```java
+public class BankAccount
+{ 
+    private double balance;
+    private int accountNumber;
+    private static int lastAssignedNumber = 1000;
+    
+    public BankAccount()
+    {
+        lastAssignedNumber++;
+        accountNumber = lastAssignedNumber;
+    }
+    . . .
+}  
+```
+
+Like instance variables, static variables should always be declared as private to ensure that methods of other classes do not change their values. However, static constants may be either private or public. For example, the BankAccount class can define a public constant value, such as
+
+```java
+public class BankAccount
+{
+    public static final double OVERDRAFT_FEE = 29.95;
+    . . .
+}
+```
+
+Methods from any class can refer to such a constant as ```BankAccount.OVERDRAFT_FEE```. 
+
+Sometimes a class defines methods that are not invoked on an object. Such a method is called a static method. A typical example of a static method is the sqrt method in the Math class. Because numbers aren’t objects, you can’t invoke methods on them. A static method is not invoked on an object.
+
+Making your own static methods for use in other classes:
+```java
+public class Financial
+{
+    /**
+        Computes a percentage of an amount. 
+        @param percentage the percentage to apply
+        @param amount the amount to which the percentage is applied
+        @return the requested percentage of the amount 
+    */
+    public static double percentOf(double percentage, double amount)
+    { 
+        return (percentage / 100) * amount;
+    }
+}
+```
+
+When calling this method, supply the name of the class containing it: 
+
+```java
+double tax = Financial.percentOf(taxRate, total);
+```
+
+### Patterns for Object Data
+
+Keeping a <ins>total</ins>: an instance variable for the total is updated in methods that increase or decrease the total amount.
+Keeping a <ins>counter</ins>: that counts events is incremented in methods that correspond to the events.
+			
+Keep a counter, such as
+```java
+private int itemCount;
+```
+Increment the counter in those methods that correspond to the events that you want to count. 
+
+```java
+public void addItem(double price)
+{
+    totalPrice = totalPrice + price;
+    itemCount++;
+}
+```
+
+You may need to clear the counter, for example at the end of a sale or a statement period. 
+
+```java
+public void clear()
+{
+    total = 0;
+    itemCount = 0;
+}
+```
+
+<ins>Collecting Values</ins>: Some objects collect numbers, strings, or other objects. For example, each multiple-choice question has a number of choices. A cash register may need to store all prices of the current sale. 
+
+Use an array list or an array to store the values. (An array list is usually simpler because you won’t need to track the number of values.) For example,
+
+public class Question
+
+```java
+{
+    private ArrayList<String> choices;
+    . . .
+
+    //In the constructor, initialize the instance variable to an empty collection:
+    public Question()
+    {
+        choices = new ArrayList<String>();
+    }
+
+    //You need to supply some mechanism for adding values. It is common to provide a method for appending a value to the collection:
+    public void add(String choice)
+    {
+        choices.add(choice);
+    }
+
+    //The user of a Question object can call this method multiple times to add the various choices.
+}
+```
+
+<ins>Managing Properties of an Object</ins>: A property is a value of an object that an object user can set and retrieve. For example, a Student object may have a name and an ID. Provide an instance variable to store the property’s value and methods to get and set it. An object property can be accessed with a getter method and changed with a setter method.
+
+```java
+public class Student
+{
+    private String name;
+    . . .
+    public String getName() { return name; }
+    public void setName(String newName) { name = newName; }
+    . . .
+
+    //It is common to add error checking to the setter method. For example, we may want to reject a blank name:
+    public void setName(String newName)
+    {
+        if (newName.length() > 0) { name = newName; }
+    }
+} 
+```
+
+```java
+//Some properties should not change after they have been set in the constructor. 
+//For example, a student’s ID may be fixed (unlike the student’s name, which may change).
+//In that case, don’t supply a setter method.
+public class Student
+{
+    private int id;
+    . . .
+    public Student(int anId) { id = anId; }
+    public String getId() { return id; }
+    // No setId method
+    . . .
+}
+```
+
+<ins>Modeling Objects with Distinct States</ins>: A property is a value of an object that an object user can set and retrieve. For example, a Student object may have a name and an ID. Provide an instance variable to store the property’s value and methods to get and set it. An object property can be accessed with a getter method and changed with a setter method.
+
+Some objects have behavior that varies depending on what has happened in the past. For example, a Fish object may look for food when it is hungry and ignore food after it has eaten. Such an object would need to remember whether it has recently eaten.
+
+Supply an instance variable that models the state, together with some constants for the state values:
+
+```java
+public class Fish
+{
+    private int hungry; 
+    
+    public static final int NOT_HUNGRY = 0; 
+    public static final int SOMEWHAT_HUNGRY = 1; 
+    public static final int VERY_HUNGRY = 2;  
+    . . .
+}
+```
+
+Alternatively, can use enumeration. Determine which methods change the state. In this example, a fish that has just eaten food, won’t be hungry. But as the fish moves, it will get hungrier.
+
+```java
+public void eat()
+{
+    hungry = NOT_HUNGRY;
+    . . .
+}
+    
+public void move()
+{
+    . . .
+    if (hungry < VERY_HUNGRY) { hungry++; }
+}
+```
+
+Finally, determine where the state affects behavior. A fish that is very hungry will want to look for food first.
+```java
+public void move()
+{
+    if (hungry == VERY_HUNGRY)
+    {
+        //Look for food.
+    }
+    . . .
+}
+```
+
+<ins>Describing the Position of an Object</ins>: To model a moving object, you need to store and update its position.
+
+
+### Packages
+
+A Java program consists of a collection of classes. So far, most of your programs have consisted of a small number of classes. As programs get larger, however, simply distributing the classes over multiple files isn’t enough. An additional structuring mechanism is needed.
+
+In Java, packages provide this structuring mechanism. A Java <ins>package</ins> is a set of related classes. For example, the Java library consists of several hundred packages, some of which are listed in Table 1. A package is a set of related classes.
+
+![alt text](pics\packages_impt.JPG "Title")
+
+### Organizing Related Classes into Packages
+
+To put one of your classes in a package, you must place a line 
+
+```java
+package packageName;
+```
+
+as the first instruction in the source file containing the class. A package name consists of one or more identifiers separated by periods. (See Section 8.12.3 of Big Java Late Objects for tips on constructing package names.)
+
+For example, let’s put the Financial class introduced in this chapter into a package named com.horstmann.bigjava. 
+
+The Financial.java file must start as follows: 
+
+```java
+package com.horstmann.bigjava;
+public class Financial
+{
+    . . .
+}
+```
+
+In addition to the named packages (such as java.util or com.horstmann.bigjava), there is a special package, called the default package, which has no name. If you did not include any package statement at the top of your source file, its classes are placed in the default package. 
+
+### Importing Packages
+
+If you want to use a class from a package, you can refer to it by its full name (package name plus class name). For example, java.util.Scanner refers to the Scanner class in the java.util package: 
+
+```java
+java.util.Scanner in = new java.util.Scanner(System.in);
+```
+
+Naturally, that is somewhat inconvenient. For that reason, you usually import a name with an import statement: 
+
+```java
+import java.util.Scanner;
+```
+
+Then you can refer to the class as Scanner without the package prefix.
+
+You can import all classes of a package with an import statement that ends in .*. For example, you can use the statement 
+
+```java
+import java.util.*;
+```
+
+to import all classes from the java.util package. That statement lets you refer to classes like Scanner or Random without a java.util prefix. The import directive lets you refer to a class of a package by its class name, without the package prefix.
+
+However, you never need to import the classes in the java.lang package explicitly. That is the package containing the most basic Java classes, such as Math and Object. These classes are always available to you. In effect, an automatic import java.lang.*; statement has been placed into every source file. 
+
+Finally, you don’t need to import other classes in the same package. For example, when you implement the class homework1.Tester, you don’t need to import the class homework1.Bank. The compiler will find the Bank class without an import statement because it is located in the same package, homework1.
+
+### Packages Names
+
+Placing related classes into a package is clearly a convenient mechanism to organize classes. However, there is a more important reason for packages: to avoid name clashes.
+
+In a large project, it is inevitable that two people will come up with the same name for the same concept. This even happens in the standard Java class library (which has now grown to thousands of classes). There is a class Timer in the java.util package and another class called Timer in the javax.swing package. You can still tell the Java compiler exactly which Timer class you need, simply by referring to them as java.util.Timer and javax.swing.Timer. 
+
+Of course, for the package-naming convention to work, there must be some way to ensure that package names are unique. It wouldn’t be good if the car maker BMW placed all its Java code into the package bmw, and some other programmer (perhaps Britney M. Walters) had the same bright idea. To avoid this problem, the inventors of Java recommend that you use a package-naming scheme that takes advantage of the uniqueness of Internet domain names. 
+			
+Use a domain name in reverse to construct an unambiguous package name.
+			
+For example, if I have a domain name horstmann.com, and there is nobody else on the planet with the same domain name. (I was lucky that the domain name horstmann.com had not been taken by anyone else when I applied. If your name is Walters, you will sadly find that someone else beat you to walters.com.) To get a package name, turn the domain name around to produce a package name prefix, such as com.horstmann.
+
+If you don’t have your own domain name, you can still create a package name that has a high probability of being unique by writing your e-mail address backwards. For example, if Britney Walters has an e-mail address walters@cs.sjsu.edu, then she can use a package name edu.sjsu.cs.walters for her own classes. 
+
+### Packages and Source Files
+
+A source file must be located in a subdirectory that matches the package name. The parts of the name between periods represent successively nested directories. For example, the source files for classes in the package com.horstmann.bigjava would be placed in a subdirectory com/horstmann/bigjava. You place the subdirectory inside the base directory holding your program’s files. For example, if you do your homework assignment in a directory /home/britney/hw8/problem1, then you can place the class files for the com.horstmann.bigjava package into the directory /home/britney/hw8/problem1/com/horstmann/bigjava, as shown in Figure 15. (Here, we are using UNIX-style file names. Under Windows, you might use c:\Users\Britney\hw8\problem1\com\horstmann\bigjava.)
+
+The path of a class file must match its package name.
+
+![alt text](pics\pckg_dir.JPG "Title")
+
+#### Common Error / Package Access
+
+CONFUSING DOTS
+
+In Java, the dot symbol ( . ) is used as a separator in the following situations: 
+•Between package names (java.util) 
+•Between package and class names (homework1.Bank) 
+•Between class and inner class names (Ellipse2D.Double) 
+•Between class and instance variable names (Math.PI) 
+•Between objects and methods (account.getBalance()) 
+
+When you see a long chain of dot-separated names, it can be a challenge to find out which part is the package name, which part is the class name, which part is an instance variable name, and which part is a method name. Consider 
+
+```java
+java.lang.System.out.println(x);
+```
+
+Because ```println``` is followed by an opening parenthesis, it must be a method name. Therefore, ```out``` must be either an object or a class with a static ```println``` method. (Of course, we know that ```out``` is an object reference of type ```PrintStream```.) Again, it is not at all clear, without context, whether ```System``` is another object, with a public variable ```out```, or a class with a static variable. Judging from the number of pages that the Java language specification devotes to this issue, even the compiler has trouble interpreting these dot-separated sequences of strings.
+
+To avoid problems, it is helpful to adopt a strict coding style. If class names always start with an uppercase letter, and variable, method, and package names always start with a lowercase letter, then confusion can be avoided. 
+
+PACKAGE ACCESS
+
+If a class, instance variable, or method has no public or private modifier, then all methods of classes in the same package can access the feature. For example, if a class is declared as public, then all other classes in all packages can use it. But if a class is declared without an access modifier, then only the other classes in the same package can use it. Package access is a reasonable default for classes, but it is extremely unfortunate for instance variables.
+
+It is a common error to forget the reserved word private, thereby opening up a potential security hole. For example, at the time of this writing, the Window class in the java.awt package contained the following declaration: 
+
+```java
+public class Window extends Container
+{  
+    String warningString;
+    . . .
+}
+```
+		
+There actually was no good reason to grant package access to the warningString instance variable—no other class accesses it. 
+Package access for instance variables is rarely useful and always a potential security risk. Most instance variables are given package access by accident because the programmer simply forgot the private reserved word. It is a good idea to get into the habit of scanning your instance variable declarations for missing private modifiers.
+
+An instance variable or method that is not declared as public or private can be accessed by all classes in the same package, which is usually not desirable.
+
+### Summary
+Understand the concepts of classes, objects, and encapsulation.  
+
+•A class describes a set of objects with the same behavior.
+•Every class has a public interface: a collection of methods through which the objects of the class can be manipulated. 
+•Encapsulation is the act of providing a public interface and hiding the implementation details.
+•Encapsulation enables changes in the implementation without affecting users of a class.
+
+Understand instance variables and method implementations of a simple class.
+
+•The methods of a class define the behavior of its objects. 
+•An object’s instance variables represent the state of the object.
+•Each object of a class has its own set of instance variables.
+•An instance method can access the instance variables of the object on which it acts.
+•A private instance variable can only be accessed by the methods of its own class.
+
+Write method headers that describe the public interface of a class.
+
+•You can use method headers and method comments to specify the public interface of a class.
+•A mutator method changes the object on which it operates.
+•An accessor method does not change the object on which it operates.
+
+Choose an appropriate data representation for a class.
+
+•Each accessor method must either retrieve a stored value or compute the result.
+•Commonly, there is more than one way of representing the data of an object, and you must make a choice.
+•Be sure that your data representation supports method calls in any order.
+
+Provide the implementation of instance methods for a class.
+
+•The object on which an instance method is applied is the implicit parameter.
+•Explicit parameters of a method are listed in the method declaration.
+
+Design and implement constructors.
+
+•A constructor initializes the instance variables of an object. 
+•A constructor is invoked when an object is created with the new operator.
+•The name of a constructor is the same as the class name.
+•A class can have multiple constructors.
+•The compiler picks the constructor that matches the construction arguments.
+•By default, numbers are initialized as 0, Booleans as false, and object references as null.
+•If you do not provide a constructor, a constructor with no arguments is generated.
+
+Write tests that verify that a class works correctly.
+
+•A unit test verifies that a class works correctly in isolation, outside a complete program.
+•To test a class, use an environment for interactive testing, or write a tester class to execute test instructions.
+•Determining the expected result in advance is an important part of testing.
+
+Use the technique of object tracing for visualizing object behavior.
+
+•Write the methods on the front of a card, and the instance variables on the back.
+•Update the values of the instance variables when a mutator method is called.
+
+Describe the behavior of object references.
+
+•An object reference specifies the location of an object.
+•Multiple object variables can contain references to the same object.
+•Primitive type variables store values. Object variables store references.
+•When copying an object reference, you have two references to the same object.
+•The null reference refers to no object.
+•In a method, the this reference refers to the implicit parameter.
+
+Understand the behavior of static variables and methods.
+
+•A static variable belongs to the class, not to any object of the class.
+•A static method is not invoked on an object.
+
+Use patterns to design the data representation of a class.  
+
+•An instance variable for the total is updated in methods that increase or decrease the total amount.
+•A counter that counts events is incremented in methods that correspond to the events.
+•An object can collect other objects in an array or array list.
+•An object property can be accessed with a getter method and changed with a setter method.
+•If your object can have one of several states that affect the behavior, supply an instance variable for the current state.
+•To model a moving object, you need to store and update its position.
+
+Use packages to organize sets of related classes.
+
+•A package is a set of related classes.
+•The import directive lets you refer to a class of a package by its class name, without the package prefix.
+•Use a domain name in reverse to construct an unambiguous package name.
+•The path of a class file must match its package name.
+•An instance variable or method that is not declared as public or private can be accessed by all classes in the same package, which is usually not desirable.
