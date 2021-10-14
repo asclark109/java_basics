@@ -2601,7 +2601,7 @@ public CashRegister()
 {
     clear();
 }
-This call is easier to understand when you use the this reference:
+// This call is easier to understand when you use the this reference:
 public CashRegister()
 {
     this.clear();
@@ -3098,3 +3098,187 @@ Use packages to organize sets of related classes.
 •Use a domain name in reverse to construct an unambiguous package name.
 •The path of a class file must match its package name.
 •An instance variable or method that is not declared as public or private can be accessed by all classes in the same package, which is usually not desirable.
+
+## Inheritence
+
+Intellij
+crtl-H: shows heirarchy of object
+shift-alt-U: on package, shows relationship among packages
+
+### Abstract class
+
+can't be instantiated. meant to be inherented by concerete sub-classes.
+
+A class must be defined as abstract as soon as an abstract method is added. Abstract method is a method that subclasses must define.
+
+### final class
+
+This disallows other developers from extending this class
+
+```java
+public final class Executive extends Manager {
+    // stuff
+}
+```
+
+### super keyowrd
+
+Abstract class have constructors, which is strange at first.
+
+Calling ```super()``` in a constructor calls the super class
+
+```java
+public Person(String name) {
+    super();
+    mName = name;
+}
+
+public Student(String name, String major) {
+    super(name);
+    mMajor = major;
+}
+```
+
+```java
+Student student = new Student("Adam","CS")
+student.getName()   // note Student does not have a getName() method! It's super class does.
+```
+
+Note, calling ```super()``` in Student does not instantiate a Person object.
+
+### Every reference is an aperture
+
+```java
+Object obj = new Double(5.87);
+```
+
+Instiating an object called obj. Points to the Double object. Now, obj has available to it all the Object methods. This works because Double extends Object in its heirarchy tree. So, a Double object can behave like an Object if so desired. Thus, references are apertures of objects.
+
+We can instantiate other Object types in the heirarchy tree for Double:
+
+```java
+Object obj = new Double(5.87);      // a few available methods
+Number num = (Number) obj;          // more available methods
+Double dub = (Double) num;          // most available methods
+// all 3 references point to different "views" of the same object
+
+// if you were to print out the following you will all get Double
+obj.getClass().getCanonicalName() // double
+num.getClass().getCanonicalName() // double
+dub.getClass().getCanonicalName() // double
+```
+
+You cannot instantiate a Double (subclass) reference that points to a super class object
+because the Double (sublcass) contains way more information than the super class object
+contains
+
+```java
+// what happens here?
+Double dub = new Object();  // VIOLATES. ERROR 
+```
+
+Instiating an object with no reference:
+```java
+new Double(5.87);      
+System.out.println(new Double (5.87))
+```
+
+### Upcasting / Downcasting
+
+```java
+Double dub = new Double(43.43)
+
+// narrow aperture
+Object obj = dub; // points to same object
+
+// don't even need to epxlicitly cast
+// Object obj = (Object) dub;
+
+// widen the aperture. more risky.
+// downcast. requires an explicit cast
+Number num = (Number) obj;
+```
+
+Why is a downcast potentially dangerous? Well, you because 
+```java
+obj = new Rectangle(1,2,5,6); // extends object. Number does too
+number num = (Number) obj;    // error! Class cast exception
+```
+
+### Overriding
+
+Overriding methods are those with the same signature of a method in the class' hierarchy.
+If you extend an abstract class, you must override methods (same with implementing
+interfaces). Important for polymorphism.
+
+```@Overide``` is optional notation. It tells the compiler to check the signature and verify
+the overloading.
+
+Useful to look at object references and classes in a freemason pyramid drawing.
+looking for a method proceeds like so:
+
+(1) start at the lowest-level of the substructure, if it's implemented there, then
+call it.
+
+(2) If not, crawl up the hierarchy until it's implemented.
+
+![alt text](pics\aperture.JPG "Title")
+
+### Overloading methods
+
+We talked about overloading of constructors.
+Overloading is helpful for constructors, but also certain methods
+
+Keep in mind when overloading the method: the return type is not sufficient to differentiate overloaded methods. Instead, it is the explicit parameters (formal parameters) of the methods that are used to differentiate the method. In other words, all methods with the same method name need to have different formal parameters.
+
+Tip, can check instance of an object like so
+
+```java
+
+public String greetOther(Employee employee, boolean shout) {
+
+    if (shout) {
+        if (employee instanceof Executive) {
+            return (greetOther((Executive) employee)).toUpperCase();
+        } else {
+            String strType = employee.getClass().getSimpleName();
+            return ("You are just a " + strType + ", leave me alone").toUpperCase();
+        } 
+    } else {
+        return greetOther(employee)
+    }
+}
+
+public String greetOther(Employee employee) {
+
+    if (employee instanceof Executive) {
+        return greetOther((Executive) employee);
+    } else {
+        String strType = employee.getClass().getSimpleName();
+        return "You are just a " + strType + ", leave me alone";
+    }
+
+}
+
+// Note! we can make this method below private!
+private String greetOther(Executive other) {
+    // do stuff
+}
+```
+
+### Interfaces
+
+A class implements an interface rather than extends it. They are essentially contracts. Any class that implements the interface must override all the interface methods with its own methods.
+
+Interface names often end with "able" to imply that they add to the capability of the class. An interface is a contract; it defines the methods.
+
+```java
+public interface Singable {
+    String sing();  //optional to precede declaration with public abstract 
+    String dance(); //optional to precede declaration with public abstract 
+}
+```
+
+Interfaces only define functionality, they do not implement it. Abstract classes allow you to create functionality that subclasses can implement or override.
+
+A class can extend only one abstract class, but it can take advantage of multiple interfaces.
