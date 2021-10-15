@@ -3282,3 +3282,1512 @@ public interface Singable {
 Interfaces only define functionality, they do not implement it. Abstract classes allow you to create functionality that subclasses can implement or override.
 
 A class can extend only one abstract class, but it can take advantage of multiple interfaces.
+
+## Implementation Inheritance 
+
+### Inheritance Hierarchies
+
+n object-oriented design, inheritance is a relationship between a more general class (called the superclass) and a more specialized class (called the subclass). The subclass inherits data and behavior from the superclass. For example, BMW might be subclass of Car. A subclass inherits data and behavior from a superclass.
+
+For example, consider a method that takes an argument of type Vehicle:
+```java
+void processVehicle(Vehicle v)
+```
+
+Because Car is a subclass of Vehicle, you can call that method with a Car object:
+
+```java
+Car myCar = new Car(. . .);
+processVehicle(myCar);
+```
+
+Why provide a method that processes Vehicle objects instead of Car objects? That method is more useful because it can handle any kind of vehicle (including Truck and Motorcycle objects). In general, when we group classes into an inheritance hierarchy, we can share common code among the classes. 
+
+TIP: Use a Single Class for Variation in Values, Inheritance for Variation in Behavior
+
+The purpose of inheritance is to model objects with different behavior. When people first learn about inheritance, they have a tendency to overuse it, by creating multiple classes even though the variation could be expressed with a simple instance variable. 
+
+Consider a program that tracks the fuel efficiency of a fleet of cars by logging the distance traveled and the refueling amounts. Some cars in the fleet are hybrids. Should you create a subclass HybridCar? Not in this application. Hybrids don’t behave any differently than other cars when it comes to driving and refueling. They just have a better fuel efficiency. A single Car class with an instance variable 
+```java
+double milesPerGallon;
+```
+is entirely sufficient. 
+
+However, if you write a program that shows how to repair different kinds of vehicles, then it makes sense to have a separate class HybridCar. When it comes to repairs, hybrid cars behave differently from other cars
+
+### Implementing Subclasses
+
+In Java, you form a subclass by specifying what makes the subclass different from its superclass. Subclass objects automatically have the instance variables that are declared in the superclass. You only declare instance variables that are not part of the superclass objects. 
+
+```A subclass inherits all methods that it does not override.```
+
+The subclass inherits all public methods from the superclass. You declare any methods that are new to the subclass, and change the implementation of inherited methods if the inherited behavior is not appropriate. When you supply a new implementation for an inherited method, you **override** the method. 
+
+```A subclass can override a superclass method by providing a new implementation.```
+
+```The extends reserved word indicates that a class inherits from a superclass.```
+
+e.g.
+```java
+public class ChoiceQuestion extends Question
+{
+    // This instance variable is added to the subclass
+    private ArrayList<String> choices;
+    
+    // This method is added to the subclass
+    public void addChoice(String choice, boolean correct) { . . . }
+    
+    // This method overrides a method from the superclass
+    public void display() { . . . }
+}
+```
+
+**COMMON ERROR**: A subclass has no access to the private instance variables of the superclass. 
+
+```java
+public ChoiceQuestion(String questionText)
+{
+    text = questionText; // Error—tries to access private superclass variable
+}
+```
+
+When faced with a compiler error, beginners commonly “solve” this issue by adding another instance variable with the same name to the subclass:
+
+```java
+public class ChoiceQuestion extends Question
+{
+
+    private ArrayList<String> choices;
+    private String text; // Don’t!
+    . . .
+}
+```
+
+Sure, now the constructor compiles, but it doesn’t set the correct text! Such a ChoiceQuestion object has two instance variables, both named text. The constructor sets one of them, and the display method displays the other. 
+
+
+### Overriding Methods
+
+The subclass inherits the methods from the superclass. If you are not satisfied with the behavior of an inherited method, you override it by specifying a new implementation in the subclass. 
+
+```An overriding method can extend or replace the functionality of the superclass method.```
+
+```Use the reserved word super to call a superclass method.```
+
+```java
+public void display() 
+{
+    // Display the question text
+    super.display(); // OK
+    // Display the answer choices
+    . . .
+}
+```
+
+
+e.g.
+```java
+
+/**
+   A question with a text and an answer.
+*/
+public class Question
+{
+   private String text;
+   private String answer;
+
+   /**
+      Constructs a question with empty question and answer.
+   */
+   public Question() 
+   {
+      text = "";
+      answer = "";
+   }
+
+   /**
+      Sets the question text.
+      @param questionText the text of this question
+   */
+   public void setText(String questionText)   
+   {
+      text = questionText;
+   }
+
+   /**
+      Sets the answer for this question.
+      @param correctResponse the answer
+   */
+   public void setAnswer(String correctResponse)
+   {
+      answer = correctResponse;
+   }
+
+   /**
+      Checks a given response for correctness.
+      @param response the response to check
+      @return true if the response was correct, false otherwise
+   */
+   public boolean checkAnswer(String response)
+   {
+      return response.equals(answer);
+   }
+
+   /**
+      Displays this question.
+   */
+   public void display()
+   {
+      System.out.println(text);
+   }
+}
+```
+
+
+**COMMON ERROR** ACCIDENTAL OVERLOADING
+
+In Java, two methods can have the same name, provided they differ in their parameter types. For example, the PrintStream class has methods called println with headers
+
+```java
+void println(int x)
+```
+and
+```java
+void println(String x)
+```
+
+These are different methods, each with its own implementation. The Java compiler considers them to be completely unrelated. We say that the println name is **overloaded**. This is different from overriding, where a subclass method provides an implementation of a method whose parameter variables have the same types.
+
+If you mean to override a method but use a parameter variable with a different type, then you accidentally introduce an overloaded method. For example,
+```java
+public class ChoiceQuestion extends Question
+{
+    . . .
+    public void display(PrintStream out) 
+    // Does not override void display()
+    {
+        . . . 
+    }
+}
+```
+
+The compiler will not complain. It thinks that you want to provide a method just for PrintStream arguments, while inheriting another method void display(). When overriding a method, be sure to check that the types of the parameter variables match exactly.
+
+#### Calling the Superclass Constructor
+
+Consider the process of constructing a subclass object. A subclass constructor can only initialize the instance variables of the subclass. But the superclass instance variables also need to be initialized. 
+			
+Unless specified otherwise, the subclass constructor calls the superclass constructor with no arguments.
+
+Unless you specify otherwise, the superclass instance variables are initialized with the constructor of the superclass that has no arguments.
+
+To call a superclass constructor, use the ```super``` reserved word in the first statement of the subclass constructor.
+
+In order to specify another constructor, you use the super reserved word, together with the arguments of the superclass constructor, as the first statement of the subclass constructor.
+
+For example, suppose the Question superclass had a constructor for setting the question text. Here is how a subclass constructor could call that superclass constructor:
+
+```java
+public ChoiceQuestion(String questionText)
+{
+    super(questionText);
+    choices = new ArrayList<String>();
+} 
+```
+
+The constructor of a subclass can pass arguments to a superclass constructor, using the reserved word super. 
+
+However, if all superclass constructors have arguments, you must use the super syntax and provide the arguments for a superclass constructor.
+
+When the reserved word super is followed by a parenthesis, it indicates a call to the superclass constructor. When used in this way, the constructor call must be the first statement of the subclass constructor. If super is followed by a period and a method name, on the other hand, it indicates a call to a superclass method, as you saw in the preceding section. Such a call can be made anywhere in any subclass method. 
+
+### Polymorphism
+
+In Java, method calls are always determined by the type of the actual object, not the type of the variable containing the object reference. This is called **dynamic method lookup**. 
+			
+Dynamic method lookup allows us to treat objects of different classes in a uniform way. This feature is called **polymorphism**. We ask multiple objects to carry out a task, and each object does so in its own way.
+
+Polymorphism makes programs easily extensible. Suppose we want to have a new kind of question for calculations, where we are willing to accept an approximate answer. All we need to do is to declare a new class NumericQuestion that extends Question, with its own checkAnswer method. Then we can call the presentQuestion method with a mixture of plain questions, choice questions, and numeric questions. The presentQuestion method need not be changed at all! Thanks to dynamic method lookup, method calls to the display and checkAnswer methods automatically select the correct method of the newly declared classes.
+
+```Polymorphism (“having multiple shapes”) allows us to manipulate objects that share a set of tasks, even though the tasks are executed in different ways. ```
+
+### Abstract Classes
+
+When you extend an existing class, you have the choice whether or not to override the methods of the superclass. Sometimes, it is desirable to force programmers to override a method. That happens when there is no good default for the superclass, and only the subclass programmer can know how to implement the method properly. An **abstract method** is the solution.
+
+```java
+public abstract void deductFees();
+```
+
+```An abstract method is a method whose implementation is not specified.```
+
+An **abstract method** has no implementation. This forces the implementors of subclasses to specify concrete implementations of this method. (Of course, some subclasses might decide to implement a do-nothing method, but then that is their choice—not a silently inherited default.)
+
+You cannot construct objects of classes with abstract methods. For example, once the Account class has an abstract method, the compiler will flag an attempt to create a new Account() as an error. 
+			
+A class for which you cannot create objects is called an **abstract class**. A class for which you can create objects is sometimes called a **concrete class**. 
+
+```An abstract class is a class that cannot be instantiated.```
+
+In Java, you must declare all abstract classes with the reserved word abstract: 
+```java
+public abstract class Account
+{ 
+    public abstract void deductFees();
+    . . .
+}
+    
+public class SavingsAccount extends Account // Not abstract
+{
+    . . .
+    public void deductFees() // Provides an implementation
+    {
+        . . .
+    }
+}
+```
+
+
+#### Final Methods and Classes
+
+Above, we showed how to force other programmers to create subclasses of abstract classes and override abstract methods. Occasionally, you may want to do the opposite and prevent other programmers from creating subclasses or from overriding certain methods. In these situations, you use the ```final``` reserved word. For example, the String class in the standard Java library has been declared as 
+
+```java
+public final class String { . . . }
+```
+
+That means that nobody can extend the String class. When you have a reference of type String, it must contain a String object, never an object of a subclass. You can also declare individual methods as final: 
+
+```java
+public class SecureAccount extends BankAccount
+{ 
+    . . .
+    public final boolean checkPassword(String password)
+    { 
+        . . .
+    }
+}
+```
+
+This way, nobody can override the checkPassword method with another method that simply returns true. 
+
+#### Protected Access
+
+We ran into a hurdle when trying to implement the display method of the ChoiceQuestion class. That method wanted to access the instance variable text of the superclass. Our remedy was to use the appropriate method of the superclass to display the text. 
+
+Java offers another solution to this problem. The superclass can declare an instance variable as protected: 
+
+```java
+public class Question
+{ 
+    protected String text;
+    . . .
+}
+```
+
+Protected data in an object can be accessed by the methods of the object’s class and all its subclasses. 
+
+Protected means that a subclass from another package cannot access protected members of arbitrary instances of their superclasses. They can only access them on instances of their own type (where type is a compile-time type of expression, since it's a compile-time check).
+
+For example, ChoiceQuestion inherits from Question, so its methods can access the protected instance variables of the Question superclass. 
+
+Some programmers like the protected access feature because it seems to strike a balance between absolute protection (making instance variables private) and no protection at all (making instance variables public). However, experience has shown that protected instance variables are subject to the same kinds of problems as public instance variables. The designer of the superclass has no control over the authors of subclasses. Any of the subclass methods can corrupt the superclass data. Furthermore, classes with protected variables are hard to modify. Even if the author of the superclass would like to change the data implementation, the protected variables cannot be changed, because someone somewhere out there might have written a subclass whose code depends on them. 
+
+In Java, protected variables have another drawback—they are accessible not just by subclasses, but also by other classes in the same package.
+
+It is best to leave all data private. If you want to grant access to the data to subclass methods only, consider making the accessor method protected. 
+
+
+
+It's probably best to avoid use of the protected keyword, erring on the side of using the private keyword instead.
+
+### Object: the cosmic superclass
+
+In Java, every class that is declared without an explicit ```extends``` clause automatically extends the class ```Object```. That is, the class ```Object``` is the direct or indirect superclass of every class in Java. The ```Object``` class defines several very general methods, including
+
+```toString```, which yields a string describing the object\
+```equals```, which compares objects with each other\
+```hashCode```, which yields a numerical code for storing the object in a set
+
+#### Overriding the ```toString``` Method
+
+The ```toString``` method returns a string representation for each object. It is often used for debugging. The ```toString``` method is called automatically whenever you concatenate a string with an object. On one side of the + concatenation operator is a string, but on the other side is an object reference. The Java compiler automatically invokes the toString method to turn the object into a string. Then both strings are concatenated.
+
+interesting example
+```java
+BankAccount momsSavings = new BankAccount(5000);
+String s = momsSavings.toString(); // Sets s to something like "BankAccount@d24606bf"
+```
+
+That’s disappointing—all that’s printed is the name of the class, followed by the hash code, a seemingly random code. The **hash code** can be used to tell objects apart—different objects are likely to have different hash codes.
+
+We don’t care about the hash code. We want to know what is inside the object. But, of course, the toString method of the Object class does not know what is inside the BankAccount class. Therefore, we have to override the method and supply our own version in the BankAccount class. We’ll follow the same format that the toString method of the Rectangle class uses: first print the name of the class, and then the values of the instance variables inside brackets. 
+
+```java
+public class BankAccount
+{ 
+    . . .
+    public String toString()
+    { 
+        return "BankAccount[balance=" + balance + "]";
+    }
+}
+```
+
+This works better: 
+
+```java
+BankAccount momsSavings = new BankAccount(5000);
+String s = momsSavings.toString(); // Sets s to "BankAccount[balance=5000]"
+```
+
+#### ```equals``` method
+
+In addition to the toString method, the Object class also provides an equals method, whose purpose is to check whether two objects have the same contents: 
+
+```java
+if (stamp1.equals(stamp2))   // Contents are the same
+``` 
+
+```The equals method checks whether two objects have the same contents.```
+
+Note! This is different from:
+```java
+if (stamp1 == stamp2) . . .    // Objects are the same—see Figure 10 
+```
+
+Let’s implement the equals method for a Stamp class. We need to override the equals method of the Object class: 
+			
+```java			
+public class Stamp
+{ 
+    private String color;
+    private int value;
+    . . .
+    public boolean equals(Object otherObject)
+    { 
+        . . .
+    }
+    . . .
+}
+```
+
+Now we have a slight problem. The Object class knows nothing about stamps, so it declares the otherObject parameter variable of the equals method to have the type Object. When overriding the method, you are not allowed to change the type of the parameter variable. Cast the parameter variable to the class Stamp: 
+
+```java
+			Stamp other = (Stamp) otherObject;
+```
+
+Then you can compare the two stamps:
+
+```java
+public boolean equals(Object otherObject)
+{ 
+    Stamp other = (Stamp) otherObject;
+    return color.equals(other.color) 
+            && value == other.value; 
+}
+```
+
+Note that this equals method can access the instance variables of any Stamp object: the access other.color is perfectly legal.
+
+
+#### ```instanceof``` Operator
+
+As discussed before, it is legal to store a subclass reference in a superclass variable:
+
+```java
+ChoiceQuestion cq = new ChoiceQuestion();
+Question q = cq; // OK
+Object obj = cq; // OK
+```
+
+Very occasionally, you need to carry out the opposite conversion, from a superclass reference to a subclass reference. If you know that an object belongs to a given class, use a cast to convert the type.
+
+For example, you may have a variable of type Object, and you happen to know that it actually holds a Question reference. In that case, you can use a cast to convert the type:
+
+```java
+Question q = (Question) obj;
+```
+
+```If you know that an object belongs to a given class, use a cast to convert the type.```
+
+However, this cast is somewhat dangerous. If you are wrong, and obj actually refers to an object of an unrelated type, then a “class cast” exception is thrown. To protect against bad casts, you can use the instanceof operator. It tests whether an object belongs to a particular type. For example, 
+
+```java
+obj instanceof Question 
+```
+
+```The instanceof operator tests whether an object belongs to a particular type.```
+
+```instanceof``` returns true if the type of ```obj``` is convertible to ```Question```. This happens if ```obj``` refers to an actual Question or to a subclass such as ChoiceQuestion. Using the ```instanceof``` operator, a safe cast can be programmed as follows: 
+```java
+if (obj instanceof Question)
+{
+    Question q = (Question) obj;
+}
+```
+
+Note that ```instanceof``` is not a method. It is an operator, just like + or <. However, it does not operate on numbers. To the left is an object, and to the right a type name.
+
+Do not use the instanceof operator to bypass polymorphism: 
+
+```java
+if (q instanceof ChoiceQuestion) // Don’t do this—see Common Error 9.5
+{
+    // Do the task the ChoiceQuestion way
+}
+else if (q instanceof Question)
+{
+    // Do the task the Question way
+}
+```
+In this case, you should implement a method doTheTask in the Question class, override it in ChoiceQuestion, and call
+
+```java
+q.doTheTask();
+```
+
+**COMMON ERROR**: Some programmers use specific type tests in order to implement behavior that varies with each class:
+
+```java
+if (q instanceof ChoiceQuestion) // Don’t do this
+{
+    // Do the task the ChoiceQuestion way
+}
+else if (q instanceof Question)
+{
+    // Do the task the Question way
+}
+```
+
+This is a poor strategy. If a new class such as NumericQuestion is added, then you need to revise all parts of your program that make a type test, adding another case:
+
+```java
+else if (q instanceof NumericQuestion)
+{
+    // Do the task the NumericQuestion way
+}
+```
+
+In contrast, consider the addition of a class NumericQuestion to our quiz program. Nothing needs to change in that program because it uses polymorphism, not type tests. Whenever you find yourself trying to use type tests in a hierarchy of classes, reconsider and use polymorphism instead. Declare a method doTheTask in the superclass, override it in the subclasses, and call
+
+```java
+q.doTheTask();
+```
+
+**Inheritance and the ```toSring``` method**
+
+You just saw how to write a toString method: Form a string consisting of the class name and the names and values of the instance variables. However, if you want your toString method to be usable by subclasses of your class, you need to work a bit harder. Instead of hardcoding the class name, call the getClass method (which every class inherits from the Object class) to obtain an object that describes a class and its properties. Then invoke the getName method to get the name of the class:
+
+```java
+public String toString()
+{ 
+    return getClass().getName() + "[balance=" + balance + "]";
+}
+```
+
+Then the toString method prints the correct class name when you apply it to a subclass, say a SavingsAccount. 
+
+```java			
+SavingsAccount momsSavings = . . . ;
+System.out.println(momsSavings);
+// Prints "SavingsAccount[balance=10000]"
+```
+
+Of course, in the subclass, you should override toString and add the values of the subclass instance variables. Note that you must call super.toString to get the instance variables of the superclass—the subclass can’t access them directly. 
+
+```java
+public class SavingsAccount extends BankAccount
+{
+    . . .
+    public String toString()
+    { 
+        return super.toString() + "[interestRate=" + interestRate + "]";
+    }
+}
+```
+
+Now a savings account is converted to a string such as ```SavingsAccount[balance= 10000][interestRate=5]```. The brackets show which variables belong to the superclass.
+
+**Inheritance and the equals Method**
+
+You just saw how to write an equals method: Cast the otherObject parameter variable to the type of your class, and then compare the instance variables of the implicit parameter and the explicit parameter.
+
+But what if someone called stamp1.equals(x) where x wasn’t a Stamp object? Then the bad cast would generate an exception. It is a good idea to test whether otherObject really is an instance of the Stamp class. The easiest test would be with the instanceof operator. However, that test is not specific enough. It would be possible for otherObject to belong to some subclass of Stamp. To rule out that possibility, you should test whether the two objects belong to the same class. If not, return false.
+
+```java
+if (getClass() != otherObject.getClass()) { return false; }
+```
+
+Moreover, the Java language specification demands that the equals method return false when otherObject is null.
+Here is an improved version of the equals method that takes these two points into account:
+
+```java
+public boolean equals(Object otherObject)
+{
+    if (otherObject == null) { return false; }
+    if (getClass() != otherObject.getClass()) { return false; }
+    Stamp other = (Stamp) otherObject;
+    return color.equals(other.color) && value == other.value;
+}
+```
+
+When you implement equals in a subclass, you should first call equals in the superclass to check whether the superclass instance variables match. Here is an example:
+
+```java
+public CollectibleStamp extends Stamp
+{
+    private int year;
+    . . .
+    public boolean equals(Object otherObject)
+    {
+        if (!super.equals(otherObject)) { return false; }
+        CollectibleStamp other = (CollectibleStamp) otherObject;
+        return year == other.year;
+    }
+}
+```
+
+### Interface Types
+
+It is often possible to design a general and reusable mechanism for processing objects by focusing on the essential operations that an algorithm needs. You use interface types to express these operations.
+
+Consider the following method that computes the average balance in an array of BankAccount objects:
+
+```java
+			public static double average(BankAccount[] objects)
+			{
+			   if (objects.length == 0) { return 0; }
+			   double sum = 0;
+			   for (BankAccount obj : objects)
+			   {
+			      sum = sum + obj.getBalance();
+			   }
+			   return sum / objects.length;
+			}
+```
+
+Now suppose you have an array of Country objects and want to determine the average of the areas: 
+```java
+public static double average(Country[] objects)
+{
+    if (objects.length == 0) { return 0; }
+    double sum = 0;
+    for (Country obj : objects)
+    {
+        sum = sum + obj.getArea();
+    }
+    return sum / objects.length;
+}
+```
+
+Clearly, the algorithm for computing the result is the same in both cases, but the details of measurement differ. How can we write a single method that computes the averages of both bank accounts and countries?
+			
+Suppose that the classes agree on a single method getMeasure that obtains the measure to be used in the data analysis. For bank accounts, getMeasure returns the balance. For countries, getMeasure returns the area. Other classes can participate too, provided that their getMeasure method returns an appropriate value. Then we can implement a single method that computes
+
+```java
+sum = sum + obj.getMeasure();
+```
+
+What is the type of the variable obj? Any class that has a getMeasure method. 
+
+In Java, an **interface type** is used to specify required operations. We will declare an interface type that we call Measurable: 
+
+```java
+public interface Measurable
+{
+    double getMeasure();
+}
+```
+
+The interface declaration lists all methods that the interface type requires. The Measurable interface type requires a single method, but in general, an interface type can require multiple methods.
+			
+Unlike a class, an interface type provides no implementation.
+			
+An interface type is similar to a class, but there are several important differences: 
+
+```
+•Methods in an interface type must be abstract (that is, without an implementation) or, as of Java 8, static or default methods
+•All methods in an interface type are automatically public.
+•An interface type cannot have instance variables.
+•An interface type cannot have static methods.
+```
+
+**SYNTAX: Interface Types**
+
+We can use the interface type Measurable to implement a “universal” method for computing averages:
+
+```java
+public static double average(Measurable[] objects)
+{
+    if (objects.length == 0) { return 0; }
+    double sum = 0;
+    for (Measurable obj : objects)
+    {
+        sum = sum + obj.getMeasure();
+    }
+    return sum / objects.length;
+}
+```
+
+```By using an interface type for a parameter variable, a method can accept objects from many classes.```
+
+### Implementing an Interface
+
+The **implements** reserved word indicates which interfaces a class implements.
+
+e.g.
+```java
+public class BankAccount implements Measurable 
+{ 
+    public double getMeasure()
+    {
+        return balance;
+    }
+    . . .
+}
+
+public class Country implements Measurable 
+{ 
+    public double getMeasure()
+    {
+        return area;
+    }
+    . . .
+}
+```
+
+### The Comparable Interface
+
+Implement the ```Comparable``` interface so that objects of your class can be compared, for example, in a sort method.
+
+```java
+public class BankAccount implements Comparable
+{
+    . . .
+    public int compareTo(Object otherObject)
+    {
+        BankAccount other = (BankAccount) otherObject;
+        if (balance < other.balance) { return -1; }
+        if (balance > other.balance) { return 1; }
+        return 0;
+    }
+    . . .
+}
+```
+
+**COMMON ERROR: Forgetting to Declare Implementing Methods as Public**: 
+The methods in an interface are not declared as public, because they are public by default. However, the methods in a class are not public by default. It is a common error to forget the public reserved word when declaring a method from an interface:
+
+```java
+public class BankAccount implements Measurable 
+{ 
+    double getMeasure() // Oops—should be public 
+    {
+        return balance;
+    }
+    . . .
+}
+```
+
+Then the compiler complains that the method has a weaker access level, namely package access instead of public access. The remedy is to declare the method as public.
+
+**Comparing Integers and Floating-Point Numbers**
+
+When you implement a comparison method, you need to return a negative integer to indicate that the first object should come before the other, zero if they are equal, or a positive integer otherwise. You have seen how to implement this decision with three branches. When you compare nonnegative integers, there is a simpler way: subtract the integers:
+
+```java
+public class Person implements Comparable 
+{ 
+    private int id; // Must be ≥ 0
+    . . . 
+    public int compareTo(Object otherObject) 
+    { 
+        Person other = (Person) otherObject; 
+        return id - other.id; 
+    } 
+}
+```
+
+The difference is negative if id < other.id, zero if the values are the same, and positive otherwise.
+			
+This trick doesn’t work if the integers can be negative because the difference can overflow (see Exercise •• R9.15). However, the Integer.
+compare method always works:
+
+```java
+return Integer.compare(id, other.id); // Safe for negative integers 
+```
+
+You cannot compare floating-point values by subtraction (see Exercise •• R9.16). Instead, use the Double.compare method:
+
+```java
+public class BankAccount implements Comparable 
+{ 
+    . . . 
+    public int compareTo(Object otherObject) 
+    { 
+        BankAccount other = (BankAccount) otherObject; 
+        return Double.compare(balance, other.balance); 
+    } 
+}
+```
+
+#### Constants in Interfaces**
+
+Interfaces cannot have instance variables, but it is legal to specify constants. 
+
+When declaring a constant in an interface, you can (and should) omit the reserved words public static final, because all variables in an interface are automatically public static final. For example, 
+
+```java
+public interface Measurable
+{ 
+    double OUNCES_PER_LITER = 33.814;
+    . . .
+
+}
+```
+
+To use this constant in programs, add the interface name: 
+
+```java
+Measurable.OUNCES_PER_LITER
+```
+
+**Generic Interface Types**
+
+```java
+public interface Comparable<T> 
+			{
+			   int compareTo(T other) 
+			}
+```
+
+The type parameter specifies the type of the objects that this class is willing to accept for comparison. Usually, this type is the same as the class type itself. For example, the BankAccount class would implement Comparable<BankAccount>, like this:
+
+```java
+public class BankAccount implements Comparable<BankAccount> 
+{ 
+    . . . 
+    public int compareTo(BankAccount other) 
+    { 
+        return Double.compare(balance, other.balance); 
+    } 
+}
+```
+			
+The type parameter has a significant advantage: You need not use a cast to convert an Object parameter variable into the desired type.
+
+Similarly, the Measurer interface can be improved by making it into a generic type:
+
+```java
+public interface Measurer<T>
+{
+    double measure(T anObject);
+}
+```
+
+The type parameter specifies the type of the parameter of the measure method. Again, you avoid the cast from Object when implementing the interface:
+
+```java
+public class AreaMeasurer implements Measurer<Rectangle>
+{
+    public double measure(Rectangle anObject)
+    {
+        double area = anObject.getWidth() * anObject.getHeight();
+        return area;
+    }
+}
+```
+
+#### Static Methods in Interfaces
+
+Before Java 8, all methods in an interface had to be abstract. Java 8 allows static methods in interfaces that work exactly like static methods in classes. A static method of an interface does not operate on objects, and its purpose should relate to the interface that contains it.
+
+For example, it would be perfectly sensible to place the average method from Section 9.6.1 into the Measurable interface:
+
+```java
+public interface Measurable 
+{ 
+    double getMeasure();  // An abstract method 
+    static double average(Measurable[] objects) // A static method 
+    { 
+        . . . // Same implementation as in Section 9.6.1
+    } 
+}
+```
+
+To call this method, provide the name of of the interface and the method name:
+
+```java
+double meanArea = Measurable.average(countries);
+```
+
+Here is a full-fledged example of this implementation
+```java
+/**
+   This program demonstrates a static method of the
+   Measurable interface.
+*/
+public class MeasurableTester
+{
+   public static void main(String[] args)
+   {
+      // Calling the static average method
+      // with an array of BankAccount objects
+
+      Measurable[] accounts = new Measurable[3];
+      accounts[0] = new BankAccount(0);
+      accounts[1] = new BankAccount(10000);
+      accounts[2] = new BankAccount(2000);
+
+      double averageBalance = Measurable.average(accounts);
+      System.out.println("Average balance: " + averageBalance);
+      System.out.println("Expected: 4000");
+
+      // Calling the static average method
+      // with an array of Country objects
+      
+      Measurable[] countries = new Measurable[3];
+      countries[0] = new Country("Uruguay", 176220);
+      countries[1] = new Country("Thailand", 513120);
+      countries[2] = new Country("Belgium", 30510);
+
+      double averageArea = Measurable.average(countries);
+      System.out.println("Average area: " + averageArea);
+      System.out.println("Expected: 239950");
+   }
+}
+
+public interface Measurable
+{
+   double getMeasure();  // An abstract method
+
+   static double average(Measurable[] objects) // A static method
+   {
+      double sum = 0;
+      for (Measurable obj : objects)
+      {
+         sum = sum + obj.getMeasure();
+      }
+      if (objects.length > 0) { return sum / objects.length; }
+      else { return 0; }
+   } 
+}
+
+/**
+   A bank account has a balance that can be changed by 
+   deposits and withdrawals.
+*/
+public class BankAccount implements measurable
+{  
+   private double balance;
+
+   /**
+      Constructs a bank account with a zero balance.
+   */
+   public BankAccount()
+   {   
+      balance = 0;
+   }
+
+   /**
+      Constructs a bank account with a given balance.
+      @param initialBalance the initial balance
+   */
+   public BankAccount(double initialBalance)
+   {   
+      balance = initialBalance;
+   }
+
+   /**
+      Deposits money into the bank account.
+      @param amount the amount to deposit
+   */
+   public void deposit(double amount)
+   {  
+      balance = balance + amount;
+   }
+
+   /**
+      Withdraws money from the bank account.
+      @param amount the amount to withdraw
+   */
+   public void withdraw(double amount)
+   {   
+      balance = balance - amount;
+   }
+
+   /**
+      Gets the current balance of the bank account.
+      @return the current balance
+   */
+   public double getBalance()
+   {   
+      return balance;
+   }
+
+   public double getMeasure()
+   {
+      return balance;
+   }
+}
+
+/**
+   A country with a name and area.
+*/
+public class Country implements Measurable
+{
+   private String name;
+   private double area;
+
+   /**
+      Constructs a country.
+      @param aName the name of the country
+      @param anArea the area of the country
+   */
+   public Country(String aName, double anArea) 
+   { 
+      name = aName;
+      area = anArea; 
+   }
+
+   /**
+      Gets the country name.
+      @return the name
+   */
+   public String getName() 
+   {
+      return name;
+   }
+
+   /**
+      Gets the area of the country.
+      @return the area
+   */
+   public double getArea() 
+   {
+      return area;
+   }
+
+   public double getMeasure() 
+   {
+      return area;
+   }
+}
+```
+
+#### Default Methods
+
+A **default method** is a non-static method in an interface that has an implementation. A class that implements the method either inherits the default behavior or overrides it. By providing default methods in an interface, it is less work to define a class that implements an interface. 
+
+For example, the Measurable interface can declare getMeasure as a default method:
+
+```java
+public interface Measurable 
+{ 
+    default double getMeasure() { return 0; } 
+}
+```
+
+If a class implements the interface and doesn’t provide a getMeasure method, then it inherits this default method.
+This particular example isn’t all that useful. One doesn’t normally want each object to have measure zero. Here is a more interesting example, in which a default method calls another interface method: 
+
+```java
+public interface Measurable 
+{ 
+    double getMeasure(); // An abstract method 
+    default boolean smallerThan(Measurable other) 
+    { 
+        return getMeasure() < other.getMeasure(); 
+    } 
+}
+```
+
+The smallerThan method tests whether an object has a smaller measure than another, which is useful for arranging objects by increasing measure. A class that implements the Measurable interface only needs to implement getMeasure, and it automatically inherits the smallerThan method. This can be a very useful mechanism. For example, the Comparator interface that is described in Special Topic 14.4 has one abstract method but more than a dozen default methods.
+
+full example
+```java
+/**
+   This program demonstrates the smallerThan default method.
+*/
+public class MeasurableTester
+{
+   public static void main(String[] args)
+   {
+      Measurable[] countries = new Measurable[3];
+      countries[0] = new Country("Uruguay", 176220);
+      countries[1] = new Country("Thailand", 513120);
+      countries[2] = new Country("Belgium", 30510);
+
+      System.out.println("Uruguay is smaller than Thailand: "
+         + countries[0].smallerThan(countries[1]));
+      System.out.println("Expected: true");
+      System.out.println("Uruguay is smaller than Belgium: "
+         + countries[0].smallerThan(countries[2]));
+      System.out.println("Expected: false");
+   }
+}
+
+public interface Measurable
+{
+   double getMeasure(); // An abstract method
+   
+   default boolean smallerThan(Measurable other)
+   {
+      return getMeasure() < other.getMeasure();
+   }
+}
+
+/**
+   A bank account has a balance that can be changed by 
+   deposits and withdrawals.
+*/
+public class BankAccount implements Measurable
+{  
+   private double balance;
+
+   /**
+      Constructs a bank account with a zero balance.
+   */
+   public BankAccount()
+   {   
+      balance = 0;
+   }
+
+   /**
+      Constructs a bank account with a given balance.
+      @param initialBalance the initial balance
+   */
+   public BankAccount(double initialBalance)
+   {   
+      balance = initialBalance;
+   }
+
+   /**
+      Deposits money into the bank account.
+      @param amount the amount to deposit
+   */
+   public void deposit(double amount)
+   {  
+      balance = balance + amount;
+   }
+
+   /**
+      Withdraws money from the bank account.
+      @param amount the amount to withdraw
+   */
+   public void withdraw(double amount)
+   {   
+      balance = balance - amount;
+   }
+
+   /**
+      Gets the current balance of the bank account.
+      @return the current balance
+   */
+   public double getBalance()
+   {   
+      return balance;
+   }
+
+   public double getMeasure()
+   {
+      return balance;
+   }
+}
+
+/**
+   A country with a name and area.
+*/
+public class Country implements Measurable
+{
+   private String name;
+   private double area;
+
+   /**
+      Constructs a country.
+      @param aName the name of the country
+      @param anArea the area of the country
+   */
+   public Country(String aName, double anArea) 
+   { 
+      name = aName;
+      area = anArea; 
+   }
+
+   /**
+      Gets the country name.
+      @return the name
+   */
+   public String getName() 
+   {
+      return name;
+   }
+
+   /**
+      Gets the area of the country.
+      @return the area
+   */
+   public double getArea() 
+   {
+      return area;
+   }
+
+   public double getMeasure() 
+   {
+      return area;
+   }
+}
+```
+
+#### Function Objects
+
+In the preceding section, we used the Measurable interface type to make it possible to provide services that work for many classes—provided they are willing to implement the interface type. But what can you do if a class does not do so? For example, we might want to compute the average length of a collection of strings, but String does not implement Measurable.
+
+Let’s rethink the approach. The average method needs to measure each object. When the objects are required to be of type Measurable, the responsibility for measuring lies with the objects themselves, which is the cause of the limitation that we noted. It would be better if another object could carry out the measurement. Let’s move the measurement method into a different interface:
+
+```java
+public interface Measurer
+{
+    double measure(Object anObject);
+}
+```
+
+The measure method measures an object and returns its measurement. We use a parameter variable of type Object, the “lowest common denominator” of all classes in Java, because we do not want to restrict which classes can be measured. 
+
+We add a parameter variable of type Measurer to the average method:
+
+```java
+public static double average(Object[] objects, Measurer meas)
+{
+    if (objects.length == 0) { return 0; }
+    double sum = 0;
+    for (Object obj : objects)
+    {
+        sum = sum + meas.measure(obj);
+    }
+    return sum / objects.length;
+}
+```
+
+When calling the method, you need to supply a Measurer object. That is, you need to implement a class with a measure method, and then create an object of that class. Let’s do that for measuring strings:
+```java			
+public class StringMeasurer implements Measurer
+{
+    public double measure(Object obj)
+    {
+        String str = (String) obj; // Cast obj to String type
+        return str.length();
+    }
+}
+```
+
+Note that the measure method must accept an argument of type Object, even though this particular measurer just wants to measure strings. The parameter variable must have the same type as in the Measurer interface. Therefore, the Object parameter variable is cast to the String type. Finally, we are ready to compute the average length of an array of strings:
+
+```java
+String[] words = { "Mary", "had", "a", "little", "lamb" };
+Measurer lengthMeasurer = new StringMeasurer();
+double result = average(words, lengthMeasurer); // result is set to 3.6
+```
+
+An object such as lengthMeasurer is called a function object. The sole purpose of the object is to execute a single method, in our case measure. (In mathematics, as well as many other programming languages, the term “function” is used where Java uses “method”.). The ```Comparator``` interface is another example of an interface for function objects.
+
+Full example
+```java
+/**
+   This program demonstrates the string measurer.
+*/
+public class MeasurerDemo
+{
+   public static void main(String[] args)
+   {
+      String[] words = { "Mary", "had", "a", "little", "lamb" };
+      Measurer lengthMeasurer = new StringMeasurer();
+      System.out.println("Average length: " 
+         + average(words, lengthMeasurer));
+   }
+
+   /**
+      Computes the average of the measures of the given objects.
+      @param objects an array of objects
+      @param meas the measurer
+      @return the average of the measures
+   */
+   public static double average(Object[] objects, Measurer meas)
+   {
+      if (objects.length == 0) { return 0; }
+      double sum = 0;
+      for (Object obj : objects)
+      {
+         sum = sum + meas.measure(obj);
+      }
+      return sum / objects.length;
+   }
+}
+
+/**
+   Describes any class whose objects can measure other objects.
+*/
+public interface Measurer
+{
+   /**
+      Computes the measure of an object.
+      @param anObject the object to be measured
+      @return the measure
+   */
+   double measure(Object anObject);
+}
+
+/**
+   This class measures the length of a string.
+*/
+public class StringMeasurer implements Measurer
+{
+   public double measure(Object obj)
+   {
+      String str = (String) obj;
+      return str.length();
+   }
+}
+```
+
+#### Lambda Expressions
+
+Above, we discusses how to use function objects for specifying variations in behavior. The average method needs to measure each object, and it does so by calling the measure method of the supplied Measurer object.
+
+Unfortunately, the caller of the average method has to do a fair amount of work; namely, to define a class that implements the Measurer interface and to construct an object of that class. Java 8 has a convenient shortcut for these steps, provided that the interface has a single abstract method. Such an interface is called a functional interface because its purpose is to define a single function. The Measurer interface is an example of a functional interface.
+
+**Functional interface**: An interface with a single abstract method whose prupose is to define a single function.
+
+
+To specify that single function, you can use a lambda expression, an expression that defines the parameters and return value of a method in a compact notation.
+
+**Lambda Expression**: An expression that defines the parameters and return value of a method in a compact notation.
+
+Here is an example:
+
+```java
+(Object obj) -> ((BankAccount) obj).getBalance()
+```
+
+This expression defines a function that, given an object, casts it to a BankAccount and returns the balance. (The term “lambda expression” comes from a mathematical notation that uses the Greek letter lambda (λ) instead of the -> symbol. In other programming languages, such an expression is called a function expression.) A lambda expression cannot stand alone. It needs to be assigned to a variable whose type is a functional interface:
+
+```java
+Measurer accountMeas = (Object obj) -> ((BankAccount) obj).getBalance();
+```
+
+Now the following actions occur:
+```
+1.  A class is defined that implements the functional interface. The single abstract method is defined by the lambda expression.
+2.  An object of that class is constructed.
+3.  The variable is assigned a reference to that object.
+```
+			
+You can also pass a lambda expression to a method. Then the parameter variable of the method is initialized with the constructed object. For example, consider the call
+
+```java
+double averageBalance = average(accounts,
+    (Object obj) –> ((BankAccount) obj).getBalance());
+```
+
+In the same way as before, an object is constructed that belongs to a class implementing Measurer. The object is used to initialize the parameter variable meas of the average method. Recall that the parameter variable has type Measurer:
+
+```java
+public static double average(Object[] objects, Measurer meas)
+{
+    . . .
+    sum = sum + meas.measure(obj);
+    . . .
+}
+```
+
+The average method calls the measure method on meas, which in turn executes the body of the lambda expression. In its simplest form, a lambda expression contains a list of parameters and the expression that is being computed from the parameters. If more work needs to be done, you can write a method body in the usual way, enclosed in braces and with a return statement:
+
+```java
+Measurer areaMeas = (Object obj) –>
+    {
+        Rectangle r = (Rectangle) obj;
+        return r.getWidth() * r.getHeight();
+    };
+```
+
+Lambda expressions enable the caller of a method to provide code that is called inside the method, and they enable the implementor of the method to invoke that code as needed. This can be achieved as follows: 
+
+```
+1.The implementor of the method defines an interface that describes the purpose of the code to be executed. That interface has a single method.
+2.The method receives a parameter of that interface, and calls the single method of the interface whenever the code that can vary needs to be called.
+3.The caller of the method provides a lambda expression whose body is the code that should be called in this invocation.  
+```
+
+You will see additional examples of using lambda expressions for event handlers (Java 8 Note 10.1) and comparators (Section 14.8). Lambda expressions are extensively used in the “streams” API for processing large data sets.
+
+Full example using lambda expressions
+```java
+import java.awt.Rectangle;
+
+/**
+   This program demonstrates the use of a Measurer.
+*/
+public class MeasurerTester
+{
+   public static void main(String[] args)
+   {
+      BankAccount[] accounts = new BankAccount[3];
+      accounts[0] = new BankAccount(0);
+      accounts[1] = new BankAccount(10000);
+      accounts[2] = new BankAccount(2000);
+
+      double averageBalance = Data.average(accounts,
+         (Object obj) -> ((BankAccount) obj).getBalance());
+      System.out.println("Average balance: " + averageBalance);
+      System.out.println("Expected: 4000");
+
+      Rectangle[] rects = new Rectangle[] 
+         {
+            new Rectangle(5, 10, 20, 30),
+            new Rectangle(10, 20, 30, 40),
+            new Rectangle(20, 30, 5, 15)
+         };
+
+      Measurer areaMeas = (Object obj) ->
+         {
+            Rectangle r = (Rectangle) obj;
+            return r.getWidth() * r.getHeight();
+         };      
+
+      double averageArea = Data.average(rects, areaMeas);
+      System.out.println("Average area: " + averageArea);
+      System.out.println("Expected: 625");
+   }
+}
+
+/**
+   Describes any class whose objects can measure other objects.
+*/
+public interface Measurer
+{
+   /**
+      Computes the measure of an object.
+      @param anObject the object to be measured
+      @return the measure
+   */
+   double measure(Object anObject);
+}
+
+/**
+   A bank account has a balance that can be changed by 
+   deposits and withdrawals.
+*/
+public class BankAccount
+{  
+   private double balance;
+
+   /**
+      Constructs a bank account with a zero balance.
+   */
+   public BankAccount()
+   {   
+      balance = 0;
+   }
+
+   /**
+      Constructs a bank account with a given balance.
+      @param initialBalance the initial balance
+   */
+   public BankAccount(double initialBalance)
+   {   
+      balance = initialBalance;
+   }
+
+   /**
+      Deposits money into the bank account.
+      @param amount the amount to deposit
+   */
+   public void deposit(double amount)
+   {  
+      balance = balance + amount;
+   }
+
+   /**
+      Withdraws money from the bank account.
+      @param amount the amount to withdraw
+   */
+   public void withdraw(double amount)
+   {   
+      balance = balance - amount;
+   }
+
+   /**
+      Gets the current balance of the bank account.
+      @return the current balance
+   */
+   public double getBalance()
+   {   
+      return balance;
+   }
+}
+
+public class Data
+{
+   /**
+      Computes the average of the measures of the given objects.
+      @param objects an array of objects
+      @param meas the measurer for the objects
+      @return the average of the measures
+   */
+   public static double average(Object[] objects, Measurer meas)
+   {
+      double sum = 0;
+      for (Object obj : objects)
+      {
+         sum = sum + meas.measure(obj);
+      }
+      if (objects.length > 0) { return sum / objects.length; }
+      else { return 0; }
+   }
+}
+```
+
+### Interfaces Summary
+
+The notions of inheritance, superclass, and subclass.
+
+•A subclass inherits data and behavior from a superclass.\
+•You can always use a subclass object in place of a superclass object.
+
+Implement subclasses in Java.
+   
+•A subclass inherits all methods that it does not override.\
+•A subclass can override a superclass method by providing a new implementation.\
+•The extends reserved word indicates that a class inherits from a superclass.
+
+Implement methods that override methods from a superclass. 
+
+•An overriding method can extend or replace the functionality of the superclass method.\
+•Use the reserved word super to call a superclass method.\
+•Unless specified otherwise, the subclass constructor calls the superclass constructor with no arguments.\
+•To call a superclass constructor, use the super reserved word in the first statement of the subclass constructor.\
+•The constructor of a subclass can pass arguments to a superclass constructor, using the reserved word super.
+
+Use polymorphism for processing objects of related types.
+   
+•A subclass reference can be used when a superclass reference is expected.\
+•Polymorphism (“having multiple shapes”) allows us to manipulate objects that share a set of tasks, even though the tasks are executed in different ways.\
+•An abstract method is a method whose implementation is not specified.\
+•An abstract class is a class that cannot be instantiated.
+
+Use the toString method and instanceof operator with objects.
+
+•Override the toString method to yield a string that describes the object’s state.\
+•The equals method checks whether two objects have the same contents.\
+•If you know that an object belongs to a given class, use a cast to convert the type.\
+•The instanceof operator tests whether an object belongs to a particular type.
+
+Use interface types for algorithms that process objects of different classes.  
+
+•A Java interface type contains the return types, names, and parameter variables of a set of methods.\
+•Unlike a class, an interface type provides no implementation.\
+•By using an interface type for a parameter variable, a method can accept objects from many classes.\
+•The implements reserved word indicates which interfaces a class implements.\
+•Implement the Comparable interface so that objects of your class can be compared, for example, in a sort method.
