@@ -4791,3 +4791,27 @@ Use interface types for algorithms that process objects of different classes.
 •By using an interface type for a parameter variable, a method can accept objects from many classes.\
 •The implements reserved word indicates which interfaces a class implements.\
 •Implement the Comparable interface so that objects of your class can be compared, for example, in a sort method.
+
+#### VarArgs
+
+
+Pass in a variable number of arguments to a function like so:
+```java
+// A method that takes variable number of integer
+// arguments.
+static void fun(int ...a)
+{
+    System.out.println("Number of arguments: " + a.length);
+
+    // using for each loop to display contents of a
+    for (int i: a)
+        System.out.print(i + " ");
+    System.out.println();
+}
+```
+
+#### Cloning
+
+Note, if you want to clone an object, you will create a new object whose instance variables are copies of that of the original object. For primitive instance variables, there'll be no issue. For object instance variables, however, you will get a copy of the memory address to the same object. So, if you attempt to mutate the instance variable object of either the original object or the cloned object, you will be mutating the same instance variable object in memory. To get around this, you will want to do a **deep clone**, which means you also perform a clone of the instance variable objects within the cloned object and assign the cloned instance variables to be the new instance variables within the cloned object.
+
+You do not need to perform a deep copy clone with String objects because they are immuatble. As soon as you would attempt to mutate an instance variable object of either the object or its clone, you would instantly create a new string.
