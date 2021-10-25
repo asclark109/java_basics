@@ -4815,3 +4815,1037 @@ static void fun(int ...a)
 Note, if you want to clone an object, you will create a new object whose instance variables are copies of that of the original object. For primitive instance variables, there'll be no issue. For object instance variables, however, you will get a copy of the memory address to the same object. So, if you attempt to mutate the instance variable object of either the original object or the cloned object, you will be mutating the same instance variable object in memory. To get around this, you will want to do a **deep clone**, which means you also perform a clone of the instance variable objects within the cloned object and assign the cloned instance variables to be the new instance variables within the cloned object.
 
 You do not need to perform a deep copy clone with String objects because they are immuatble. As soon as you would attempt to mutate an instance variable object of either the object or its clone, you would instantly create a new string.
+
+## Graphical User Interfaces
+
+### Frame Windows
+
+A graphical application shows information inside a frame: a window with a title bar. To show a frame, construct a ```JFrame``` object, set its size, and make it visible.
+
+```Java
+JFrame frame = new JFrame(); 
+final int FRAME_WIDTH = 300;
+final int FRAME_HEIGHT = 400; 
+frame.setSize(FRAME_WIDTH, FRAME_HEIGHT); 
+
+// 3. set title frame
+frame.setTitle("An empty frame"); 
+//If you omit this step, the title bar is simply left blank. 
+
+// 4.Set the “default close operation”:
+frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+// When the user closes the frame, the program automatically exits. Don’t omit this step. If you do, the program keeps running even after the 
+// frame is closed.
+ 
+// 5.Make the frame visible:
+frame.setVisible(true);
+```
+
+### Adding User-Interface Components to a Frame
+
+If you have more than one component, put them into a panel (a container for other user-interface components), and then add the panel to the frame. Use a JPanel to group multiple user-interface components together.
+
+```java
+JPanel panel = new JPanel();
+panel.add(button);
+panel.add(label);
+frame.add(panel);
+
+JButton button = new JButton("Click me!");
+JLabel label = new JLabel("Hello, World!");
+```
+
+### Using Inheritance to Customize Frames
+
+In Java, you can use inheritance to customize a frame.
+
+```Declare a JFrame subclass for a complex frame.```
+
+As you add more user-interface components to a frame, the frame can get quite complex. Your programs will become easier to understand when you use inheritance for complex frames. To do so, design a subclass of JFrame. Store the components as instance variables. Initialize them in the constructor of your subclass. This approach makes it easy to add helper methods for organizing your code. It is also a good idea to set the frame size in the frame constructor. The frame usually has a better idea of the preferred size than the program displaying it.
+
+```java
+public class FilledFrame extends JFrame
+{
+    // Use instance variables for components 
+    private JButton button;
+    private JLabel label;
+    
+    private static final int FRAME_WIDTH = 300;
+    private static final int FRAME_HEIGHT = 100;
+    
+    public FilledFrame()
+    { 
+        // Now we can use a helper method 
+        createComponents();
+    
+        // It is a good idea to set the size in the frame constructor 
+        setSize(FRAME_WIDTH, FRAME_HEIGHT);
+    }
+    
+    private void createComponents()
+    {
+        button = new JButton("Click me!");
+        label = new JLabel("Hello, World!");
+        JPanel panel = new JPanel();
+        panel.add(button);
+        panel.add(label);      
+        add(panel);
+    }
+}
+
+public class FilledFrameViewer2
+{ 
+    public static void main(String[] args)
+    { 
+        JFrame frame = new FilledFrame();
+        frame.setTitle("A frame with two components");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);      
+    }
+}
+```
+
+#### Adding a main method to the Frame Class
+
+Have another look at the FilledFrame and FilledFrameViewer2 classes. Some programmers prefer to combine these two classes, by adding the main method to the frame class:
+```java
+public class FilledFrame extends JFrame
+{ 
+    . . . 
+    public static void main(String[] args)
+    {
+        JFrame frame = new FilledFrame();
+        frame.setTitle("A frame with two components");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+    
+    public FilledFrame()
+    {
+        createComponents();
+        setSize(FRAME_WIDTH, FRAME_HEIGHT); 
+    }
+    . . .
+}
+```
+
+
+### Events and Event Handling
+
+In an application that interacts with the user through a console window, user input is under control of the program. The program asks the user for input in a specific order. For example, a program might ask the user to supply first a name, then a dollar amount. But the programs that you use every day on your computer don’t work like that. In a program with a modern graphical user interface, the user is in control. The user can use both the mouse and the keyboard and can manipulate many parts of the user interface in any desired order. For example, the user can enter information into text fields, pull down menus, click buttons, and drag scroll bars in any order. The program must react to the user commands in whatever order they arrive. Having to deal with many possible inputs in random order is quite a bit harder than simply forcing the user to supply input in a fixed order. 
+
+#### Listening to Events
+
+Whenever the user of a graphical program types characters or uses the mouse anywhere inside one of the windows of the program, the program receives a notification that an event has occurred. For example, whenever the mouse moves a tiny interval over a window, a “mouse move” event is generated. Clicking a button or selecting a menu item generates an “action” event. 
+
+Most programs don’t want to be flooded by irrelevant events. For example, when a button is clicked with the mouse, the mouse moves over the button, then the mouse button is pressed, and finally the button is released. Rather than receiving all these mouse events, a program can indicate that it only cares about button clicks, not about the underlying mouse events. On the other hand, if the mouse input is used for drawing shapes on a virtual canvas, a program needs to closely track mouse events.
+
+```User-interface events include key presses, mouse moves, button clicks, menu selections, and so on.```
+
+Every program must indicate which events it needs to receive. It does that by installing event listener objects. These objects are instances of classes that you must provide. The methods of your event listener classes contain the instructions that you want to have executed when the events occur. 
+
+To install a listener, you need to know the event source. The event source is the user-interface component, such as a button, that generates a particular event. You add an event listener object to the appropriate event sources. Whenever the event occurs, the event source calls the appropriate methods of all attached event listeners.
+
+```An event listener belongs to a class created by the application programmer. Its methods describe the actions to be taken when an event occurs.```
+
+This sounds somewhat abstract, so let’s run through an extremely simple program that prints a message whenever a button is clicked. Button listeners must belong to a class that implements the ActionListener interface:
+
+```java
+public interface ActionListener
+{
+    void actionPerformed(ActionEvent event);
+}
+```
+
+This particular interface has a single method, actionPerformed. It is your job to supply a class whose actionPerformed method contains the instructions that you want executed whenever the button is clicked. Here is a very simple example of such a listener class:
+
+```java
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+/** 
+    An action listener that prints a message.
+*/
+public class ClickListener implements ActionListener
+{
+    public void actionPerformed(ActionEevent event)
+    {
+        System.out.println("I was clicked.");
+    }
+}
+```
+
+We ignore the event parameter variable of the actionPerformed method—it contains additional details about the event, such as the time at which it occurred. Note that the event handling classes are defined in the java.awt.event package. (AWT is the Abstract Window Toolkit, the Java library for dealing with windows and events.)
+			
+
+```Attach an ActionListener to each button so that your program can react to button clicks.```
+
+Once the listener class has been declared, we need to construct an object of the class and add it to the button:
+
+```java
+ActionListener listener = new ClickListener();
+button.addActionListener(listener);
+```
+
+Whenever the button is clicked, the Java event handling library calls
+
+```java
+listener.actionPerformed(event);
+```
+
+As a result, the message is printed. 
+
+
+### Using Inner Classes for Listeners
+
+n the preceding section, you saw how to specify button actions. The code for the button action is placed into a listener class. It is common to implement listener classes as inner classes like this:
+
+```java
+public class ButtonFrame2 extends JFrame
+{
+    . . .
+    // This inner class is declared inside the frame class
+    class ClickListener implements ActionListener 
+    {
+        . . .
+    }
+    
+    private void createComponents()
+    {
+        button = new JButton("Click me!");
+        ActionListener listener = new ClickListener();
+        button.addActionListener(listener);
+        . . .
+    }
+}
+```
+An inner class is simply a class that is declared inside another class.
+
+There are two advantages to making a listener class into an inner class. First, listener classes tend to be very short. You can put the inner class close to where it is needed, without cluttering up the remainder of the project. Moreover, inner classes have a very attractive feature: 
+
+Their methods can access instance variables and methods of the surrounding class. 
+
+```Methods of an inner class can access variables from the surrounding class.```
+
+This feature is particularly useful when implementing event handlers. It allows the inner class to access variables without having to receive them as constructor or method arguments. 
+
+Let’s look at an example. Instead of printing the message “I was clicked”, we want to show it in a label. If we make the action listener into an inner class of the frame class, its actionPerformed method can access the label instance variable and call the setText method, which changes the label text.
+
+```java
+
+public class ButtonFrame2 extends JFrame
+{
+    private JButton button;
+    private JLabel label;
+    . . . 
+    class ClickListener implements ActionListener 
+    {
+        public void actionPerformed(ActionEvent event)
+        {
+            // Accesses label variable from surrounding class
+            label.setText("I was clicked"); 
+        }
+    }
+    . . .
+}
+```
+
+#### Common Errors
+
+**Modifying Parameter Types in the Implemeneting Method**
+
+When you implement an interface, you must declare each method exactly as it is specified in the interface. Accidentally making small changes to the parameter variable types is a common error. Here is the classic example,
+
+```java
+class MyListener implements ActionListener
+{
+    public void actionPerformed() 
+    // Oops . . . forgot ActionEvent parameter variable
+    {
+        . . .
+    }
+}
+```
+
+As far as the compiler is concerned, this class fails to provide the method
+
+```java
+public void actionPerformed(ActionEvent event)
+```
+
+You have to read the error message carefully and pay attention to the parameter variable and return types to find your error.
+
+
+**Forgetting to Attach a Listener**
+
+If you run your program and find that your buttons seem to be dead, double-check that you attached the button listener. The same holds for other user-interface components. It is a surprisingly common error to program the listener class and the event handler action without actually attaching the listener to the event source. 
+
+**Tip: Don't use a Frame as a Listener**
+
+we use inner classes for event listeners. That approach works for many different event types. Once you master the technique, you don’t have to think about it anymore. Many development environments automatically generate code with inner classes, so it is a good idea to be familiar with them. 
+
+However, some programmers bypass the event listener classes and turn a frame into a listener, like this: 
+
+```java
+public class InvestmentFrame extends JFrame
+        implements ActionListener  // This approach is not recommended 
+{ 
+    . . .
+    public InvestmentFrame()
+    {
+        button = new JButton("Add Interest");
+        button.addActionListener(this);
+        . . .
+    }
+    
+    public void actionPerformed(ActionEvent event)
+    {
+    }
+    . . .
+}
+```
+
+Now the actionPerformed method is a part of the InvestmentFrame class rather than part of a separate listener class. The listener is installed as this. 
+
+We don’t recommend this technique. If the viewer class contains two buttons that each generate action events, then the actionPerformed method must investigate the event source, which leads to code that is tedious and error-prone. 
+
+**Local Inner Class**
+
+An inner class can be declared completely inside a method. For example,
+
+```java
+public static void main(String[] args)
+{
+    . . . 
+    class ClickListener implements ActionListener 
+    {
+        public void actionPerformed(ActionEvent event)
+        {
+            . . .
+        }
+    }
+    
+    JButton button = new JButton("Click me");
+    button.addActionListener(new ClickListener());
+    . . .
+}
+```
+
+This places the inner class exactly where you need it, next to the button. 
+
+The methods of a class that is defined inside a method can access the variables of the enclosing method. Prior to Java 8, it was necessary to declare those variables as final. For example, 
+
+```java
+public static void main(String[] args)
+{
+    final JLabel label = new JLabel("Hello, World!");
+    . . . 
+    class ClickListener implements ActionListener 
+    {
+        public void actionPerformed(ActionEvent event)
+        {
+            label.setText("I was clicked"); 
+            // Accesses label variable from enclosing method
+        }
+    }
+    . . . 
+    button.addActionListener(new ClickListener());
+}
+```
+
+As of Java 8, the variable must be effectively final. Such a variable must behave like a final variable (that is, stay unchanged after it has been initialized), but it need not be declared with the final modifier. The requirement to be final or effectively final sounds quite restrictive. However, it is usually not an issue if the variable is an object reference. Keep in mind that an object variable is final when the variable always refers to the same object. The state of the object can change, but the variable can’t refer to a different object. For example, in our program, we never intended to have the label variable refer to multiple labels, so there was no harm in declaring it as final.
+However, you can’t change a numeric or Boolean local variable from an inner class. For example, the following would not work:
+
+```java
+public static void main(String[] args)
+{
+    final double balance = INITIAL_BALANCE;
+    . . . 
+
+    class AddInterestListener implements ActionListener 
+    {
+        public void actionPerformed(ActionEvent event)
+        {
+            double interest = balance * (1 + INTEREST_RATE);
+            balance = balance + interest;
+            // Error: Can’t modify a final numeric variable
+        }
+    }
+    . . . 
+}
+```
+
+The remedy is to use an object instead:
+
+```java
+public static void main(String[] args)
+{
+    final BankAccount account = new BankAccount();
+    account.deposit(INITIAL_BALANCE);
+    . . . 
+    class AddInterestListener implements ActionListener 
+    {
+        public void actionPerformed(ActionEvent event)
+        {
+            double interest = balance * (1 + INTEREST_RATE);
+            account.deposit(interest);
+            // Ok––we don’t change the reference, just the object’s state
+        }
+    }
+    . . .
+}
+```
+
+**Anonymous Inner Classes**
+An entity is anonymous if it does not have a name. In a program, something that is only used once doesn’t usually need a name. For example, you can replace
+
+```java
+String buttonLabel = "Add Interest";
+JButton button = new JButton(buttonLabel);
+```
+
+with
+
+```java
+JButton button = new JButton("Add Interest");
+```
+
+The string "Add Interest" is an anonymous object. Programmers like anonymous objects, because they don’t have to go through the trouble of coming up with a name. If you have struggled with the decision whether to call a label l, label, or buttonLabel, you’ll understand this sentiment.
+
+Event listeners often give rise to a similar situation. You construct a single object of an event listener class. Afterward, the class is never used again. In Java, it is possible to declare an anonymous class if all you ever need is a single object of the class. 
+Here is an example:
+
+```java
+button = new JButton("Add Interest");
+button.addActionListener(new ActionListener()
+{
+    public void actionPerformed(ActionEvent event)
+    {
+        double interest = balance * (1 + INTEREST_RATE);
+        account.deposit(interest);
+    }
+});
+```
+This means: Define a class that implements the ActionListener interface with the given actionPerformed method. Construct an object of that class and pass it to the addActionListener method.
+
+Many programmers like this style because it is so compact. Moreover, GUI builders in integrated development environments often generate code of this form.
+
+**Lambda Expressions for Event Handling**
+
+We discussed lambda expressions for instances of classes that implement “functional” interfaces; that is, interfaces with a single abstract method. This includes event handlers such as ActionListener objects.
+
+For example, instead of declaring a ClickListener class and adding an instance as a listener to a button, you can simply add the listener as follows:
+
+```java
+button.addActionListener( 
+    (ActionEvent event) –> System.out.println("I was clicked."));
+```
+
+#### Processing Text Input
+
+#### Text Fields
+
+The JTextField class provides a text field for reading a single line of text. When you construct a text field, you need to supply the width—the approximate number of characters that you expect the user to type.
+
+```java
+final int FIELD_WIDTH = 10;
+rateField = new JTextField(FIELD_WIDTH);
+```
+
+Users can type additional characters, but then a part of the contents of the field becomes invisible. You will want to label each text field so that the user knows what to type into it. Construct a JLabel object for each label:
+
+```java
+JLabel rateLabel = new JLabel("Interest Rate: ");
+```
+
+You want to give the user an opportunity to enter all information into the text fields before processing it. Therefore, you should supply a button that the user can press to indicate that the input is ready for processing. 
+
+When that button is clicked, its actionPerformed method should read the user input from each text field, using the getText method of the JTextField class. The getText method returns a String object. In our sample program, we turn the string into a number, using the Double.parseDouble method. After updating the account, we show the balance in another label.
+
+```java
+class AddInterestListener implements ActionListener
+{
+    public void actionPerformed(ActionEvent event)
+    {
+        double rate = Double.parseDouble(rateField.getText());
+        double interest = balance * rate / 100;
+        balance = balance + interest;
+        resultLabel.setText("Balance: " + balance);
+    }
+}
+```
+
+#### Text Areas
+
+When constructing a text area, you can specify the number of rows and columns: 
+
+```java
+final int ROWS = 10; // Lines of text
+final int COLUMNS = 30; // Characters in each row
+JTextArea textArea = new JTextArea(ROWS, COLUMNS);
+```
+
+Use the setText method to set the text of a text field or text area. The append method adds text to the end of a text area. Use newline characters to separate lines, like this:
+
+```java
+textArea.append(balance + "\n");
+```
+
+If you want to use a text field or text area for display purposes only, call the setEditable method like this 
+
+```java
+textArea.setEditable(false);
+```
+
+Now the user can no longer edit the contents of the field, but your program can still call setText and append to change it. 
+
+As shown in Figure 6, the JTextField and JTextArea classes are subclasses of the class JTextComponent. The methods setText and setEditable are declared in the JTextComponent class and inherited by JTextField and JTextArea. However, the append method is declared in the JTextArea class.
+
+![alt text](pics\text_areas.JPG "Title")
+
+To add scroll bars to a text area, use a JScrollPane, like this: 
+
+```java
+JTextArea textArea = new JTextArea(ROWS, COLUMNS);
+JScrollPane scrollPane = new JScrollPane(textArea);
+```
+
+```You can add scroll bars to any component with a JScrollPane.```
+
+#### Creating Drawings
+
+#### Drawing on a Component
+
+You cannot draw directly onto a frame. Instead, you add a component to the frame and draw on the component. To do so, extend the JComponent class and override its paintComponent method.
+
+```java
+public class ChartComponent extends JComponent
+{
+    public void paintComponent(Graphics g)
+    { 
+        Drawing instructions.
+    }
+}
+```
+
+```In order to display a drawing, provide a class that extends the JComponent class.```
+
+Place drawing instructions inside the paintComponent method. That method is called whenever the component needs to be repainted.
+
+When the component is shown for the first time, its paintComponent method is called automatically. The method is also called when the window is resized, or when it is shown again after it was hidden. 
+
+The paintComponent method receives an object of type Graphics. The Graphics object stores the graphics state—the current color, font, and so on, that are used for drawing operations. The Graphics class has methods for drawing geometric shapes. The call
+
+```java
+g.fillRect(x, y, width, height)
+```
+
+draws a solid rectangle with upper-left corner (x, y) and the given width and height. If you call the drawRect method, you obtain the outline of the rectangle instead, without having the interior filled.
+
+```The Graphics class has methods to draw rectangles and other shapes.```
+
+Here we produce three filled rectangles. They line up on the left because they all have x = 0. They also all have the same height.
+
+```java
+public class ChartComponent extends JComponent
+{ 
+    public void paintComponent(Graphics g)
+    { 
+        g.fillRect(0, 10, 200, 10);
+        g.fillRect(0, 30, 300, 10);
+        g.fillRect(0, 50, 100, 10);
+    }
+}
+```
+
+#### Ovals, Lines, Text, and Color
+
+To draw an oval, you specify its bounding box (see Figure 9) in the same way that you would specify a rectangle, namely by the x- and y-coordinates of the top-left corner and the width and height of the box. Then the call
+
+```java
+g.drawOval(x, y, width, height);   
+```
+
+draws the outline of an oval. To draw a circle, simply set the width and height to the same values: 
+
+```java
+g.drawOval(x, y, diameter, diameter);
+```
+
+Notice that (x, y) is the top-left corner of the bounding box, not the center of the circle.
+
+```Use drawRect, drawOval, and drawLine to draw geometric shapes.```
+
+```Use drawRect, drawOval, and drawLine to draw geometric shapes.```
+
+When you set a new color in the graphics context, it is used for subsequent drawing operations.
+
+```java
+g.setColor(Color.YELLOW);
+g.fillOval(350, 25, 35, 20); // Fills the oval in yellow
+```
+
+```java
+// Call the repaint method whenever the state of a painted component changes.
+// When placing a painted component into a panel, you need to specify its preferred size.
+
+chart.setPreferredSize(new Dimension(CHART_WIDTH, CHART_HEIGHT));
+```
+
+#### Common Errors
+
+When you change the data in a painted component, the component is not automatically painted with the new data. You must call the repaint method of the component. Your component’s paintComponent method will then be invoked. Note that you should not call the paintComponent method directly. 
+
+The best place to call repaint is in the method of your component that modifies the data values:
+
+```java
+void changeData(. . .)
+{
+    Update data values.
+    repaint();
+}
+```
+
+This is a concern only for your own painted components. When you make a change to a standard Swing component such as a JLabel, the component is automatically repainted.
+
+**By Default, Components Have Zero Width and Height**
+
+You must be careful when you add a painted component, such as a component displaying a chart, to a panel. The default size for a JComponent is 0 by 0 pixels, and the component will not be visible. The remedy is to call the setPreferredSize method: 
+
+```java
+chart.setPreferredSize(new Dimension(CHART_WIDTH, CHART_HEIGHT));
+```
+
+This is an issue only for painted components. Buttons, labels, and so on, know how to compute their preferred size.
+
+## Layout Management
+
+```User-interface components are arranged by placing them inside containers. Containers can be placed inside larger containers.```
+
+Up to now, you have had limited control over the layout of user-interface components. You learned how to add components to a panel, and the panel arranged the components from left to right. However, in many applications, you need more sophisticated arrangements. 
+
+In Java, you build up user interfaces by adding components into containers such as panels. Each container has its own **layout manager**, which determines how components are laid out.
+
+```Each container has a layout manager that directs the arrangement of its components.```
+
+By default, a JPanel uses a **flow layout**. A flow layout simply arranges its components from left to right and starts a new row when there is no more room in the current row. 
+
+Another commonly used layout manager is the border layout. The **border layout** groups components into five areas: center, north, south, west, and east (see Figure 1). Each area can hold a single component, or it can be empty.
+
+```Three useful layout managers are the border layout, flow layout, and grid layout.```
+
+The border layout is the default layout manager for a frame (or, more technically, the frame’s content pane). But you can also use the border layout in a panel:
+
+```When adding a component to a container with the border layout, specify the NORTH, SOUTH, WEST, EAST, or CENTER position.```
+
+panel.setLayout(new BorderLayout());
+Now the panel is controlled by a border layout, not the flow layout. When adding a component, you specify the position, like this:
+panel.add(component, BorderLayout.NORTH);
+
+```The content pane of a frame has a border layout by default. A panel has a flow layout by default.```
+
+The **grid layout** manager arranges components in a grid with a fixed number of rows and columns. All components are resized so that they all have the same width and height. Like the border layout, it also expands each component to fill the entire allotted area. (If that is not desirable, you need to place each component inside a panel.) Figure 2 shows a number pad panel that uses a grid layout. 
+
+To create a grid layout, you supply the number of rows and columns in the constructor, then add the components, row by row, left to right: 
+
+```java
+JPanel buttonPanel = new JPanel();
+buttonPanel.setLayout(new GridLayout(4, 3));
+buttonPanel.add(button7);
+buttonPanel.add(button8);
+buttonPanel.add(button9);
+buttonPanel.add(button4);
+```
+
+### Radio Buttons
+
+```For a small set of mutually exclusive choices, use a group of radio buttons or a combo box.```
+
+If the choices are mutually exclusive, use a set of radio buttons. In a radio button set, only one button can be selected at a time. When the user selects another button in the same set, the previously selected button is automatically turned off. (These buttons are called radio buttons because they work like the station selector buttons on a car radio: If you select a new station, the old station is automatically deselected.) For example, in Figure 4, the font sizes are mutually exclusive. You can select small, medium, or large, but not a combination of them. 
+			
+```Add radio buttons to a ButtonGroup so that only one button in the group is selected at any time.```
+
+To create a set of radio buttons, first create each button individually, and then add all buttons in the set to a ButtonGroup object: 
+
+```java
+JRadioButton smallButton = new JRadioButton("Small");
+JRadioButton mediumButton = new JRadioButton("Medium");
+JRadioButton largeButton = new JRadioButton("Large");
+    
+ButtonGroup group = new ButtonGroup();
+group.add(smallButton);
+group.add(mediumButton);
+group.add(largeButton);
+```
+
+The isSelected method is called to find out whether a button is currently selected or not. For example, 
+
+```java
+if (largeButton.isSelected()) { size = LARGE_SIZE; }
+```
+
+Unfortunately, there is no convenient way of finding out which button in a group is currently selected. You have to call isSelected on each button. Because users will expect one radio button in a radio button group to be selected, call setSelected(true) on the default radio button before making the enclosing frame visible. 
+
+```You can place a border around a panel to group its contents visually.```
+
+If you have multiple button groups, it is a good idea to group them together visually. It is a good idea to use a panel for each set of radio buttons, but the panels themselves are invisible. You can add a border to a panel to make it visible. In Figure 4, for example, the panels containing the Size radio buttons and Style check boxes have borders. 
+
+#### Check Boxes
+
+```For a binary choice, use a check box. ```
+			
+A check box is a user-interface component with two states: checked and unchecked. You use a group of check boxes when one selection does not exclude another. For example, the choices for “Bold” and “Italic” in Figure 4 are not exclusive. You can choose either, both, or neither. Therefore, they are implemented as a set of separate check boxes. Radio buttons and check boxes have different visual appearances. Radio buttons are round and have a black dot when selected. Check boxes are square and have a check mark when selected. 
+
+You construct a check box by providing the name in the constructor: 
+
+```java
+JCheckBox italicCheckBox = new JCheckBox("Italic");
+```
+
+
+#### Combo Boxes
+
+If you have a large number of choices, you don’t want to make a set of radio buttons, because that would take up a lot of space. Instead, you can use a combo box. This component is called a combo box because it is a combination of a list and a text field. The text field displays the name of the current selection. When you click on the arrow to the right of the text field of a combo box, a list of selections drops down, and you can choose one of the items in the list 
+
+```For a large set of choices, use a combo box.```
+
+If the combo box is editable, you can also type in your own selection. To make a combo box editable, call the setEditable method. 
+
+You add strings to a combo box with the addItem method. 
+
+```java
+JComboBox facenameCombo = new JComboBox();
+facenameCombo.addItem("Serif");
+facenameCombo.addItem("SansSerif");
+. . .
+```
+
+You get the item that the user has selected by calling the getSelectedItem method. However, because combo boxes can store other objects in addition to strings, the getSelectedItem method has return type Object. Hence, in our example, you must cast the returned value back to String:
+
+```java
+String selectedString = (String) facenameCombo.getSelectedItem();  
+```
+
+You can select an item for the user with the setSelectedItem method.
+
+Radio buttons, check boxes, and combo boxes generate an ActionEvent whenever the user selects an item. In the following program, we don’t care which component was clicked—all components notify the same listener object. Whenever the user clicks on any one of them, we simply ask each component for its current content, using the isSelected and getSelectedItem methods. We then redraw the label with the new font.
+
+```Radio buttons, check boxes, and combo boxes generate action events, just as buttons do.```
+
+**PROGRAMMING TIP: Use a GUI Builder**
+
+### Menus
+
+```A frame contains a menu bar. The menu bar contains menus. A menu contains submenus and menu items.```
+
+You add the menu bar to the frame:
+
+```java
+public class MyFrame extends JFrame
+{
+    public MyFrame()
+    {
+        JMenuBar menuBar = new JMenuBar();
+        setJMenuBar(menuBar);
+        . . .
+    }
+    . . .
+}
+```
+
+Menus are then added to the menu bar:
+
+```java
+JMenu fileMenu = new JMenu("File");
+JMenu fontMenu = new JMenu("Font");
+menuBar.add(fileMenu);
+menuBar.add(fontMenu);
+```
+
+You add menu items and submenus with the add method: 
+
+```java
+JMenuItem exitItem = new JMenuItem("Exit");
+fileMenu.add(exitItem);
+    
+JMenu styleMenu = new JMenu("Style");
+fontMenu.add(styleMenu); // A submenu
+```
+
+
+Menu items generate action events.
+
+A menu item has no further submenus. When the user selects a menu item, the menu item sends an action event. Therefore, you want to add a listener to each menu item: 
+
+```java
+ActionListener listener = new ExitItemListener();
+exitItem.addActionListener(listener);
+```
+
+You add action listeners only to menu items, not to menus or the menu bar. When the user clicks on a menu name and a submenu opens, no action event is sent. 
+
+To keep the program readable, it is a good idea to use a separate method for each menu or set of related menus. For example,
+
+```java
+public JMenu createFaceMenu()
+{
+    JMenu menu = new JMenu("Face");
+    menu.add(createFaceItem("Serif"));
+    menu.add(createFaceItem("SansSerif"));
+    menu.add(createFaceItem("Monospaced"));
+    return menu;
+}  
+```
+
+Now consider the createFaceItem method. It has a string parameter variable for the name of the font face. When the item is selected, its action listener needs to 
+
+1.Set the current face name to the menu item text.
+
+2.Make a new font from the current face, size, and style, and apply it to the label.
+We have three menu items, one for each supported face name. Each of them needs to set a different name in the first step. Of course, we can make three listener classes SerifListener, SansSerifListener, and MonospacedListener, but that is not very elegant. After all, the actions only vary by a single string. We can store that string inside the listener class and then make three objects of the same listener class:
+
+```java
+class FaceItemListener implements ActionListener
+{
+    private String name;
+    
+    public FaceItemListener(String newName) { name = newName; }
+    
+
+    public void actionPerformed(ActionEvent event)
+    {
+        facename = name; // Sets an instance variable of the frame class
+        setLabelFont(); 
+    }
+}
+```
+
+Now we can install a listener object with the appropriate name:
+
+```java
+public JMenuItem createFaceItem(String name)
+{
+    JMenuItem item = new JMenuItem(name);      
+    ActionListener listener = new FaceItemListener(name);
+    item.addActionListener(listener);
+    return item;
+}
+```
+
+This approach is still a bit tedious. We can do better by using a local inner class (see Special Topic 10.2). When we move the declaration of the inner class inside the createFaceItem method, the actionPerformed method can access the name parameter variable directly. Before Java 8, it was necessary to declare name as a final variable in order for it to be accessible from an inner class method. 
+
+```java
+public JMenuItem createFaceItem(final String name) 
+{
+    class FaceItemListener implements ActionListener // A local inner class
+    {
+        public void actionPerformed(ActionEvent event)
+        {
+            facename = name; // Accesses the local variable name
+            setLabelFont();
+        }
+    }      
+    
+    JMenuItem item = new JMenuItem(name);      
+    ActionListener listener = new FaceItemListener();
+    item.addActionListener(listener);
+    return item;
+}
+```
+
+The same strategy is used for the createSizeItem and createStyleItem methods.
+
+### Exploring the Swing Documentation
+
+```You should learn to navigate the API documentation to find out more about user-interface components.```
+
+E.g.
+```java
+public JSlider()
+    //Creates a horizontal slider with the range 0 to 100 and an initial value of 50.
+```
+
+
+### Using Timer Events for Animations
+
+The Timer class in the javax.swing package generates a sequence of action events, spaced at even time intervals. (You can think of a timer as an invisible button that is automatically clicked.) This is useful whenever you want to send continuous updates to a component. For example, in an animation, you may want to update a scene ten times per second and redisplay the image to give the illusion of movement. 
+
+```A timer generates action events at fixed intervals.```
+
+When you use a timer, you specify the frequency of the events and an object of a class that implements the ActionListener interface. Place whatever action you want to occur inside the actionPerformed method. Finally, start the timer.
+
+```java
+class MyListener implements ActionListener
+{
+    public void actionPerformed(ActionEvent event)
+    {
+        // Action that is executed at each timer event. 
+    }
+}
+    
+MyListener listener = new MyListener();
+Timer t = new Timer(interval, listener);
+t.start();
+```
+
+Then the timer calls the actionPerformed method of the listener object every interval milliseconds. 
+
+Our sample program will display a moving rectangle. We first supply a RectangleComponent class with a moveRectangleBy method that moves the rectangle by a given amount. 
+
+Note the call to repaint in the moveRectangleBy method. This call is necessary to ensure that the component is repainted after the position of the rectangle has been changed. The call to repaint forces a call to the paintComponent method. The paintComponent method redraws the component, causing the rectangle to appear at the updated location. 
+
+The actionPerformed method of the timer listener moves the rectangle one pixel down and to the right:
+
+```java
+scene.moveRectangleBy(1, 1); 
+```
+
+```To make an animation, the timer listener should update and repaint a component several times per second. ```
+
+Because the actionPerformed method is called many times per second, the rectangle appears to move smoothly across the frame. 
+
+### Mouse Events
+
+If you write programs that show drawings, and you want users to manipulate the drawings with a mouse, then you need to listen to mouse events. Mouse listeners are more complex than action listeners, the listeners that process button clicks and timer ticks.
+
+```You use a mouse listener to capture mouse events.```
+
+A mouse listener must implement the MouseListener interface, which contains the following five methods: 
+
+```java
+public interface MouseListener
+{ 
+    void mousePressed(MouseEvent event);
+        // Called when a mouse button has been pressed on a component 
+    void mouseReleased(MouseEvent event);
+        // Called when a mouse button has been released on a component 
+    void mouseClicked(MouseEvent event);
+        // Called when the mouse has been clicked on a component 
+    void mouseEntered(MouseEvent event);
+        // Called when the mouse enters a component 
+    void mouseExited(MouseEvent event);
+        // Called when the mouse exits a component 
+}
+```
+
+The mousePressed and mouseReleased methods are called whenever a mouse button is pressed or released. If a button is pressed and released in quick succession, and the mouse has not moved, then the mouseClicked method is called as well. The mouseEntered and mouseExited methods can be used to highlight a user-interface component whenever the mouse is pointing inside it. 
+
+The most commonly used method is mousePressed. Users generally expect that their actions are processed as soon as the mouse button is pressed. 
+You add a mouse listener to a component by calling the addMouseListener method:
+
+```java
+public class MyMouseListener implements MouseListener
+{
+    public void mousePressed(MouseEvent event)
+    { 
+        int x = event.getX();
+        int y = event.getY();
+        Process mouse event at (x, y).
+    }
+    
+    // Do-nothing methods
+    public void mouseReleased(MouseEvent event) {}
+    public void mouseClicked(MouseEvent event) {}
+    public void mouseEntered(MouseEvent event) {}
+    public void mouseExited(MouseEvent event) {}
+}
+    
+MouseListener listener = new MyMouseListener();
+component.addMouseListener(listener);
+```
+
+In the sample program, a user clicks on a component containing a rectangle. Whenever the mouse button is pressed, the rectangle is moved to the mouse location. We first enhance the RectangleComponent class and add a moveRectangleTo method to move the rectangle to a new position. 
+
+Note the call to repaint in the moveRectangleTo method. As you saw before, this call causes the component to repaint itself and show the rectangle in the new position. 
+
+Now, add a mouse listener to the component. Whenever the mouse is pressed, the listener moves the rectangle to the mouse location. 
+
+```java
+class MousePressListener implements MouseListener
+{ 
+    public void mousePressed(MouseEvent event)
+    { 
+        int x = event.getX();
+        int y = event.getY();
+        scene.moveRectangleTo(x, y);
+    }
+    . . .
+}
+```
+
+It often happens that a particular listener specifies actions only for one or two of the listener methods. Nevertheless, all five methods of the interface must be implemented. The unused methods are simply implemented as do-nothing methods. 
+
+### Keyboard Events
+
+If you program a game, you may want to process keystrokes, such as the arrow keys. Add a key listener to the component on which you draw the game scene. The KeyListener interface has three methods. As with a mouse listener, you are most interested in key press events, and you can leave the other two methods empty. Your key listener class should look like this:
+
+```java
+class MyKeyListener implements KeyListener
+{ 
+    public void keyPressed(KeyEvent event)
+    { 
+        String key = KeyStroke.getKeyStrokeForEvent(event).toString();
+        key = key.replace("pressed ", ""); 
+        Process key.
+    }
+    
+
+    // Do-nothing methods
+    public void keyReleased(KeyEvent event) {}
+    public void keyTyped(KeyEvent event) {}
+}
+```
+
+The call KeyStroke.getKeyStrokeForEvent(event).toString() turns the event object into a text description of the key, such as "pressed LEFT". In the next line, we eliminate the "pressed " prefix. The remainder is a string such as "LEFT" or "A" that describes the key that was pressed. 
+
+You can find a list of all key names in the API documentation of the KeyStroke class.
+
+```Whenever the program user presses a key, a key event is generated.```
+    
+As always, remember to attach the listener to the event source:
+
+```java
+KeyListener listener = new MyKeyListener();
+scene.addKeyListener(listener);
+```
+
+In order to receive key events, your component must call 
+
+```java
+scene.setFocusable(true);
+```
+
+### Event Adapters
+
+In the preceding section you saw how to install a mouse listener in a mouse event source and how the listener methods are called when an event occurs. Usually, a program is not interested in all listener notifications. For example, a program may only be interested in mouse clicks and may not care that these mouse clicks are composed of “mouse pressed” and “mouse released” events. Of course, the program could supply a listener that declares all those methods in which it has no interest as “do-nothing” methods, for example: 
+
+```java
+class MouseClickListener implements MouseListener
+{ 
+    public void mouseClicked(MouseEvent event) 
+    { 
+        Mouse click action
+    }
+    
+    // Four do-nothing methods 
+    public void mouseEntered(MouseEvent event) {}
+    public void mouseExited(MouseEvent event) {}
+    public void mousePressed(MouseEvent event) {}
+    public void mouseReleased(MouseEvent event) {}
+}
+```
+
+To avoid this labor, some friendly soul has created a MouseAdapter class that implements the MouseListener interface such that all methods do nothing. You can extend that class, inheriting the do-nothing methods and overriding the methods that you care about, like this:
+
+```java
+class MouseClickListener extends MouseAdapter
+{ 
+    public void mouseClicked(MouseEvent event)
+    { 
+        Mouse click action
+    }
+}
+```
+
+There is also a KeyAdapter that implements the KeyListener interface, providing three do-nothing methods.
