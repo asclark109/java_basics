@@ -4942,7 +4942,7 @@ Most programs don’t want to be flooded by irrelevant events. For example, when
 
 ```User-interface events include key presses, mouse moves, button clicks, menu selections, and so on.```
 
-Every program must indicate which events it needs to receive. It does that by installing event listener objects. These objects are instances of classes that you must provide. The methods of your event listener classes contain the instructions that you want to have executed when the events occur. 
+Every program must indicate which events it needs to receive. It does that by installing **event listener** objects. These objects are instances of classes that you must provide. The methods of your **event listener** classes contain the instructions that you want to have executed when the events occur. 
 
 To install a listener, you need to know the event source. The event source is the user-interface component, such as a button, that generates a particular event. You add an event listener object to the appropriate event sources. Whenever the event occurs, the event source calls the appropriate methods of all attached event listeners.
 
@@ -4999,7 +4999,7 @@ As a result, the message is printed.
 
 ### Using Inner Classes for Listeners
 
-n the preceding section, you saw how to specify button actions. The code for the button action is placed into a listener class. It is common to implement listener classes as inner classes like this:
+In the preceding section, you saw how to specify button actions. The code for the button action is placed into a listener class. It is common to implement listener classes as inner classes like this:
 
 ```java
 public class ButtonFrame2 extends JFrame
@@ -5849,3 +5849,577 @@ class MouseClickListener extends MouseAdapter
 ```
 
 There is also a KeyAdapter that implements the KeyListener interface, providing three do-nothing methods.
+
+# Object-Oriented Design
+
+## Classes and Their Responsibilities
+
+When you design a program, you work from a requirements specification, a description of what your program should do. The designer’s task is to discover structures that make it possible to implement the requirements in a computer program. In the following sections, we will examine the steps of the design process.
+
+### Discovering Classes
+
+One simple approach for discovering classes and methods is to look for the nouns and verbs in the requirements specification. Often, nouns correspond to classes, and verbs correspond to methods.
+
+```To discover classes, look for nouns in the problem description.```
+
+```Concepts from the problem domain are good candidates for classes.```
+
+### CRC Card Method
+
+**Classes, Responsibilities, and Collaborators (CRC Method)**: use an index card for each class. As you think about verbs in the task description that indicate methods, you pick the card of the class that you think should be responsible, and write that responsibility on the card. For each responsibility, you record which other classes are needed to fulfill it. Those classes are the **collaborators**. 
+
+### Cohesion
+
+A class should represent a single concept. The public methods and constants that the public interface exposes should be cohesive. That is, all interface features should be closely related to the single concept that the class represents. 
+
+If you find that the public interface of a class refers to multiple concepts, then that is a good sign that it may be time to use separate classes instead. Consider, for example, the public interface of a CashRegister class:
+
+```java
+public class CashRegister
+{
+    public static final double NICKEL_VALUE = 0.05;
+    public static final double DIME_VALUE = 0.1;
+    public static final double QUARTER_VALUE = 0.25;
+    . . .
+    public void enterPayment(int dollars, int quarters, 
+            int dimes, int nickels, int pennies) { . . . }
+    . . .
+}
+```
+
+There are really two concepts here: a cash register that holds coins and computes their total, and the values of individual coins. (For simplicity, we assume that the cash register only holds coins, not bills. 
+
+It makes sense to have a separate Coin class and have coins responsible for knowing their values. 
+
+```java
+public class Coin
+{
+    . . .
+    public Coin(double aValue, String aName) { . . . }
+    public double getValue() { . . . }
+    . . .
+} 
+```
+
+Then the CashRegister class can be simplified:
+
+```java
+public class CashRegister
+{
+    . . .
+    public void enterPayment(int coinCount, Coin coinType) { . . . }
+    . . .
+}
+```
+
+## Relationships between Classes
+
+When designing a program, it is useful to document the relationships between classes. This helps you in a number of ways. For example, if you find classes with common behavior, you can save effort by placing the common behavior into a superclass. If you know that some classes are not related to each other, you can assign different programmers to implement each of them, without worrying that one of them has to wait for the other.
+
+Here are different potential relationships.
+
+### Dependency
+
+Many classes need other classes in order to do their jobs. This dependency relationship is sometimes nicknamed the **“knows about”** relationship. The cash register knows that there are coin objects. In contrast, the Coin class does not depend on the CashRegister class. Coins have no idea that they are being collected in cash registers, and they can carry out their work without ever calling any method in the CashRegister class.
+
+```A class depends on another class if it uses objects of that class.```
+
+**Unifided Modeling Language, UML** is a notation for object-oriented analysis and design invented by Grady Booch, Ivar Jacobson, and James Rumbaugh, three leading researchers in object-oriented software development. The UML notation distinguishes between object diagrams and class diagrams. An object diagram shows individual objects, their attributes, and the relationships between them. 
+
+In a class diagram, dependency is denoted by a dashed line with a -> shaped open arrow tip. The arrow tip points to the class on which the other class depends.
+
+
+![alt text](pics\dependency.JPG "Title")
+
+If many classes of a program depend on each other, then we say that the **coupling between classes is high**. Conversely, if there are few dependencies between classes, then we say that the **coupling is low**. 
+
+**It is a good practice to minimize the coupling (i.e., dependency) between classes.**
+
+### Aggregation
+
+Another fundamental relationship between classes is the “aggregation” relationship (which is informally known as the **“has-a”** relationship). 
+
+The **aggregation relationship** states that objects of one class contain objects of another class.
+
+Consider a quiz that is made up of questions. Because each quiz has one or more questions, we say that the class ```Quiz``` aggregates the class ```Question```.
+
+In the UML notation, aggregation is denoted by a line with a diamond-shaped symbol attached to the aggregating class
+
+![alt text](pics\aggregation.JPG "Title")
+
+Finding out about aggregation is very helpful for deciding how to implement classes. For example, when you implement the Quiz class, you will want to store the questions of a quiz as an instance variable. 
+
+Because a quiz can have any number of questions, an array or array list is a good choice for collecting them:
+
+```java
+public class Quiz
+{
+    private ArrayList<Question> questions;
+    . . .
+}
+```
+
+**Aggregation is a stronger form of dependency**. If a class has objects of another class, it certainly knows about the other class. However, the converse is not true. For example, a class may use the ```Scanner``` class without ever declaring an instance variable of class Scanner. The class may simply construct a local variable of type Scanner, or its methods may receive Scanner objects as arguments. This <ins>use is not aggregation because the objects of the class don’t contain Scanner objects—they just create or receive them for the duration of a single method.</ins>
+
+Generally, you need aggregation when an object needs to remember another object between method calls. 
+
+## Inheritance
+
+**Inheritance** is a relationship between a more general class (the superclass) and a more specialized class (the subclass). This relationship is often described as the **“is-a”** relationship. Every truck is a vehicle. Every savings account is a bank account. 
+
+<ins>Inheritance is sometimes abused</ins>. 
+
+For example, consider a Tire class that describes a car tire. Should the class Tire be a subclass of a class Circle? It sounds convenient. There are quite a few useful methods in the Circle class—for example, the Tire class may inherit methods that compute the radius, perimeter, and center point, which should come in handy when drawing tire shapes. Though it may be convenient for the programmer, this arrangement makes no sense conceptually. It isn’t true that every tire is a circle. Tires are car parts, whereas circles are geometric objects. There is a relationship between tires and circles, though. A tire has a circle as its boundary. Use aggregation: 
+
+```java
+public class Tire
+{ 
+    private String rating;
+    private Circle boundary;
+    . . .
+}
+```
+
+```Inheritance (the is-a relationship) is sometimes inappropriately used when the has-a relationship would be more appropriate.```
+
+Another example: Every car is a vehicle. Every car has a tire (in fact, it typically has four or, if you count the spare, five). Thus, you would use inheritance from Vehicle and use aggregation of Tire objects.
+
+```java
+public class Car extends Vehicle
+{ 
+    private Tire[] tires;
+    . . . 
+} 
+```
+
+```Aggregation (the has-a relationship) denotes that objects of one class contain references to objects of another class. ```
+
+
+Be able to distinguish the UML notation for inheritance, interface implementation, aggregation, and dependency:
+
+![alt text](pics\UML_notation.JPG "Title")
+
+### Special Topic: Attributes and Methods in UML
+
+Sometimes, it is useful to indicate class attributes and methods in a class diagram. An attribute is an externally observable property that objects of a class have. 
+
+```For example, name and price would be attributes of the Product class.```
+
+Usually, attributes correspond to instance variables. But they don’t have to—a class may have a different way of organizing its data. For example, a ```GregorianCalendar``` object from the Java library has attributes day, month, and year, and it would be appropriate to draw a UML diagram that shows these attributes. However, the class doesn’t actually have instance variables that store these quantities. Instead, it internally represents all dates by counting the milliseconds from January 1, 1970—an implementation detail that a class user certainly doesn’t need to know about.
+
+You can indicate attributes and methods in a class diagram by dividing a class rectangle into three compartments, with the class name in the top, attributes in the middle, and methods in the bottom (see the figure below). You need not list all attributes and methods in a particular diagram. Just list the ones that are helpful for understanding whatever point you are making with a particular diagram. 
+
+Also, don’t list as an attribute what you also draw as an aggregation. If you denote by aggregation the fact that a Car has Tire objects, don’t add an attribute tires. 
+
+![alt text](pics\attr_method_uml.JPG "Title")
+
+ome designers like to write multiplicities at the end(s) of an aggregation relationship to denote how many objects are aggregated. The notations for the most common multiplicities are:
+
+•any number (zero or more): *\
+•one or more: 1..*\
+•zero or one: 0..1\
+•exactly one: 1
+
+The figure below shows that a customer has one or more bank accounts. 
+
+![alt text](pics\uml_mult.JPG "Title")
+
+
+### Special Topic: Aggregation, Association, and Composition
+
+Some designers find the aggregation or has-a terminology unsatisfactory. For example, consider customers of a bank. Does the bank “have” customers? Do the customers “have” bank accounts, or does the bank “have” them? Which of these “has” relationships should be modeled by aggregation? This line of thinking can lead us to premature implementation decisions. 
+
+Early in the design phase, it makes sense to use a more general relationship between classes called **association**. A class is associated with another if you can navigate from objects of one class to objects of the other class.
+
+```For example, given a Bank object, you can navigate to Customer objects, perhaps by accessing an instance variable, or by making a database lookup. ```
+
+The UML notation for an association relationship is a solid line, with optional arrows that show in which directions you can navigate the relationship. You can also add words to the line ends to further explain the nature of the relationship. The figure below shows that you can navigate from Bank objects to Customer objects, but you cannot navigate the other way around. That is, in this particular design, the Customer class has no mechanism to determine in which banks it keeps its money.
+
+![alt text](pics\association.JPG "Title")
+
+The UML standard also recognizes a stronger form of the aggregation relationship called **composition**, where the aggregated objects do not have an existence independent of the containing object. For example, composition models the relationship between a bank and its accounts. If a bank closes, the account objects cease to exist as well. In the UML notation, composition looks like aggregation with a filled-in diamond. 
+
+![alt text](pics\composition.JPG "Title")
+
+Frankly, the differences between aggregation, association, and composition can be confusing, even to experienced designers. If you find the distinction helpful, by all means use the relationship that you find most appropriate. But don’t spend time pondering subtle differences between these concepts. From the practical point of view of a Java programmer, it is useful to know when objects of one class have references to objects of another class. The aggregation or has-a relationship accurately describes this phenomenon.
+
+### Tip: don't use parallel arrays
+
+If storing bank account numbers and the balances of the account numbers, do NOT create two arrays that are managed in parallel (**parallel arrays**). In this situation, the i-th index of both arrays correspond to the same tuple of data. Instead, create a single data structure (e.g. a Class) that holds both of this information together. Then, store these objects in a list. 
+
+### (1) Requirements
+
+Before you begin designing a solution, you should gather all requirements for your program in plain English. Write down what your program should do. It is helpful to include typical scenarios in addition to a general description.
+
+```Start the development process by gathering and documenting program requirements.```
+
+### (2) CRC cards
+
+Use the CRC method to discover classes, responsibilities, and collaborators.
+
+### (3) UML Diagrams
+
+After you have discovered classes and their relationships with CRC cards, you should record your findings in a UML diagram. The dependency relationships come from the collaboration column on the CRC cards. Each class depends on the classes with which it collaborates.
+
+ In our example, the Invoice class collaborates with the Address, LineItem, and Product classes. The LineItem class collaborates with the Product class.
+
+Now ask yourself which of these dependencies are actually aggregations. How does an invoice know about the address, line item, and product objects with which it collaborates? An invoice object must hold references to the address and the line items when it formats the invoice. But an invoice object need not hold a reference to a product object when adding a product. The product is turned into a line item, and then it is the item’s responsibility to hold a reference to it. 
+
+Therefore, the Invoice class aggregates the Address and LineItem classes. The LineItem class aggregates the Product class. However, there is no has-a relationship between an invoice and a product. An invoice doesn’t store products directly—they are stored in the LineItem objects.
+
+There is no inheritance in this example. 
+
+```Start the development process by gathering and documenting program requirements.```
+
+![alt text](pics\ex_UML.JPG "Title")
+
+### (4) Method Documentation
+
+The final step of the design phase is to write the documentation of the discovered classes and methods. Simply write a Java source file for each class, write the method comments for those methods that you have discovered, and leave the bodies of the methods blank. 
+
+```Use javadoc comments (with the method bodies left blank) to record the behavior of classes.```
+
+```java
+/**
+    Describes an invoice for a set of purchased products. 
+*/
+public class Invoice
+{  
+    /**
+        Adds a charge for a product to this invoice. 
+        @param aProduct the product that the customer ordered 
+        @param quantity the quantity of the product 
+    */
+    public void add(Product aProduct, int quantity)
+    { 
+    }
+    
+    /**
+        Formats the invoice. 
+        @return the formatted invoice 
+    */
+    public String format()
+    { 
+    }
+}
+    
+    
+    
+/**
+    Describes a quantity of an article to purchase. 
+*/
+public class LineItem
+{ 
+    /**
+        Computes the total cost of this line item. 
+        @return the total price 
+    */
+    public double getTotalPrice()
+    { 
+    }
+
+    
+    /**
+        Formats this item. 
+        @return a formatted string of this item 
+    */
+    public String format()
+    { 
+    }
+}
+    
+    
+    
+/**
+    Describes a product with a description and a price. 
+*/
+public class Product
+{ 
+    /**
+        Gets the product description. 
+        @return the description 
+    */
+    public String getDescription()
+    { 
+    }
+    
+    /**
+        Gets the product price. 
+        @return the unit price 
+    */
+    public double getPrice()
+    {
+    }
+}
+    
+    
+    
+/**
+    Describes a mailing address. 
+*/
+public class Address
+{ 
+    /**
+        Formats the address. 
+        @return the address as a string with three lines 
+    */
+    public String format()
+    { 
+    }
+}
+```
+
+Then run the ```javadoc``` program to obtain a neatly formatted version of your documentation in HTML format (see Figure 10). 
+
+### (5) Implementation
+
+After you have completed the object-oriented design, you are ready to implement the classes. 
+
+You already have the method parameter variables and comments from the previous step. Now look at the UML diagram to add instance variables. Aggregated classes yield instance variables. Start with the Invoice class. An invoice aggregates Address and LineItem. Every invoice has one billing address, but it can have many line items.  To store multiple LineItem objects, you can use an array list. Now you have the instance variables of the Invoice class: 
+
+```java
+public class Invoice
+{ 
+    private Address billingAddress;
+    private ArrayList<LineItem> items;
+    . . .
+}
+```
+
+A line item needs to store a Product object and the product quantity. That leads to the following instance variables: 
+```java
+public class LineItem
+{ 
+    private int quantity;
+    private Product theProduct;
+    . . .
+}
+```
+
+The methods themselves are now easy to implement. Here is a typical example. You already know what the getTotalPrice method of the LineItem class needs to do—get the unit price of the product and multiply it with the quantity:
+
+```java
+/**
+    Computes the total cost of this line item. 
+    @return the total price 
+*/
+public double getTotalPrice()
+{ 
+    return theProduct.getPrice() * quantity;
+} 
+```
+
+We will not discuss the other methods in detail—they are equally straightforward. Finally, you need to supply constructors, another routine task. The entire program is shown below. It is a good practice to go through it in detail and match up the classes and methods to the CRC cards and UML diagram. 
+
+```java
+////////////////InvoicePrinter.java//////////////////
+/**
+   This program demonstrates the invoice classes by printing
+   a sample invoice.
+*/
+public class InvoicePrinter
+{  
+   public static void main(String[] args)
+   {  
+      Address samsAddress 
+            = new Address("Sam's Small Appliances",
+               "100 Main Street", "Anytown", "CA", "98765");
+
+      Invoice samsInvoice = new Invoice(samsAddress);
+      samsInvoice.add(new Product("Toaster", 29.95), 3);
+      samsInvoice.add(new Product("Hair dryer", 24.95), 1);
+      samsInvoice.add(new Product("Car vacuum", 19.99), 2);
+
+      System.out.println(samsInvoice.format());           
+   }
+}
+
+////////////Address.java//////////////////
+/**
+   Describes a mailing address.
+*/
+public class Address
+{  
+   private String name;
+   private String street;
+   private String city;
+   private String state;
+   private String zip;
+
+   /**
+      Constructs a mailing address. 
+      @param aName the recipient name
+      @param aStreet the street
+      @param aCity the city
+      @param aState the two-letter state code
+      @param aZip the ZIP postal code
+   */
+   public Address(String aName, String aStreet,
+         String aCity, String aState, String aZip)
+   {  
+      name = aName;
+      street = aStreet;
+      city = aCity;
+      state = aState;
+      zip = aZip;
+   }   
+
+   /**
+      Formats the address.
+      @return the address as a string with three lines
+   */
+   public String format()
+   {  
+      return String.format("%s%n%s%n%s, %s %s",
+         name, street, city, state, zip);
+   }
+}
+
+////////////////Invoice.java////////////////////////
+import java.util.ArrayList;
+
+/**
+   Describes an invoice for a set of purchased products.
+*/
+public class Invoice
+{  
+   private Address billingAddress;
+   private ArrayList<LineItem> items;
+
+   /**
+      Constructs an invoice.
+      @param anAddress the billing address
+   */
+   public Invoice(Address anAddress)
+   {  
+      items = new ArrayList<LineItem>();
+      billingAddress = anAddress;
+   }
+  
+   /**
+      Adds a charge for a product to this invoice.
+      @param aProduct the product that the customer ordered
+      @param quantity the quantity of the product
+   */
+   public void add(Product aProduct, int quantity)
+   {  
+      LineItem anItem = new LineItem(aProduct, quantity);
+      items.add(anItem);
+   }
+
+   /**
+      Formats the invoice.
+      @return the formatted invoice
+   */
+   public String format()
+   {  
+      String r =  String.format("%32s%n%n", "I N V O I C E")
+            + billingAddress.format()
+            + String.format("%n%n%-30s%8s%5s%8s%n",
+               "Description", "Price", "Qty", "Total");
+
+      for (LineItem item : items)
+      {  
+         r = String.format("%s%s%n", r, item.format());
+      }
+
+      r = r + String.format("%nAMOUNT DUE: $%8.2f%n", getAmountDue());
+
+      return r;
+   }
+
+   /**
+      Computes the total amount due.
+      @return the amount due
+   */
+   private double getAmountDue()
+   {  
+      double amountDue = 0;
+      for (LineItem item : items)
+      {  
+         amountDue = amountDue + item.getTotalPrice();
+      }
+      return amountDue;
+   }
+}
+
+//////////////////LineItem.java////////////////////
+/**
+   Describes a quantity of an article to purchase.
+*/
+public class LineItem
+{  
+   private int quantity;
+   private Product theProduct;
+
+   /**
+      Constructs an item from the product and quantity.
+      @param aProduct the product
+      @param aQuantity the item quantity
+   */
+   public LineItem(Product aProduct, int aQuantity)
+   {  
+      theProduct = aProduct;
+      quantity = aQuantity;
+   }
+   
+   /**
+      Computes the total cost of this line item.
+      @return the total price
+   */
+   public double getTotalPrice()
+   {  
+      return theProduct.getPrice() * quantity;
+   }
+   
+   /**
+      Formats this item.
+      @return a formatted string of this item
+   */
+   public String format()
+   {  
+      return String.format("%-30s%8.2f%5d%8.2f", 
+         theProduct.getDescription(), theProduct.getPrice(), 
+         quantity, getTotalPrice());
+   }
+}
+
+//////////////////Product.java//////////////////
+/**
+   Describes a product with a description and a price.
+*/
+public class Product
+{  
+   private String description;
+   private double price;
+
+   /**
+      Constructs a product from a description and a price.
+      @param aDescription the product description
+      @param aPrice the product price
+   */
+   public Product(String aDescription, double aPrice)
+   {  
+      description = aDescription;
+      price = aPrice;
+   }
+   
+   /**
+      Gets the product description.
+      @return the description
+   */
+   public String getDescription()
+   {  
+      return description;
+   }
+
+   /**
+      Gets the product price.
+      @return the unit price
+   */
+   public double getPrice()
+   {
+      return price;
+   }
+}
+```
